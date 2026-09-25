@@ -111,3 +111,16 @@ One line per non-obvious choice: **decision** — rationale.
   model must not require editing the config validator.
 - **Bug fix + regression test:** OTP rejection sampling was only covered by chance (crypto/rand);
   `TestRandomDigits_RejectionSamplingIsDeterministic` pins it.
+
+## Phase 11
+- **Bug fix + regression coverage:** jsonb parameters were sent as `[]byte`, which pgx encodes as
+  bytea in the pgbouncer-safe exec mode (`pool_mode=transaction`) → Postgres rejected the JSON. All
+  jsonb writes now send text, and the test harness uses the production pool mode so the whole suite
+  guards against this class of bug.
+- **Outbox is flushed after every request** (not only writes) — reads can publish (fresh weather
+  fetch) and serverless has no worker; with nothing pending it is a single indexed query.
+- **`Serve` stops the outbox worker when the server exits on its own**, not only on cancellation.
+- **Module constructor errors are joined (`errors.Join`)** in the composition root — one failure path.
+- **Config files are read with `os.ReadFile`** (absolute paths work, e.g. mounted in a container).
+- **Docker image defaults to `pool_mode=session`** (direct Postgres); Vercel uses the `transaction`
+  default behind a pooler.

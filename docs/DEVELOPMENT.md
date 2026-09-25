@@ -22,3 +22,20 @@ complete). Secrets (`AGRI_DATABASE_URL`, `AGRI_AUTH_JWT_SECRET`, …) come from 
 ```bash
 go run ./cmd/api -config config.example.yaml -set http.addr=:9090
 ```
+
+## Running locally
+```bash
+docker run -d --name agri-pg -p 5432:5432 -e POSTGRES_USER=agri -e POSTGRES_PASSWORD=agri -e POSTGRES_DB=agrismart postgres:16-alpine
+cp backend/.env.example backend/.env && set -a && . backend/.env && set +a
+make migrate seed
+make run            # http://localhost:8080/healthz
+```
+Or the whole stack: `docker compose -f deploy/docker/docker-compose.yml up --build`.
+
+## Regenerating generated artefacts
+| Artefact | Command |
+|---|---|
+| `backend/openapi/openapi.yaml`, error catalogue golden | `make openapi` |
+| permission matrix golden | `cd backend && go test ./internal/platform/authz -update` |
+| advisory golden fixtures | `cd backend && go test ./internal/modules/advisory -update` |
+| mobile dictionaries | `make i18n-sync` |

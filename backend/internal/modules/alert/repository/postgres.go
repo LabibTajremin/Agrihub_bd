@@ -31,7 +31,7 @@ func (r Alerts) Insert(ctx context.Context, a domain.Alert) (bool, error) {
 	params, _ := json.Marshal(a.Params)
 	tag, err := r.DB.Q(ctx).Exec(ctx, `INSERT INTO alert_alerts (id, user_id, kind, severity, title_key, body_key, params, source_event_id, created_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (user_id, source_event_id, kind) DO NOTHING`,
-		a.ID, a.UserID, a.Kind, a.Severity, a.TitleKey, a.BodyKey, params, a.SourceEventID, a.CreatedAt)
+		a.ID, a.UserID, a.Kind, a.Severity, a.TitleKey, a.BodyKey, string(params), a.SourceEventID, a.CreatedAt)
 	return tag.RowsAffected() == 1, err
 }
 

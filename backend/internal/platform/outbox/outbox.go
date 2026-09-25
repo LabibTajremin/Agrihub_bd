@@ -28,7 +28,7 @@ func NewPublisher(db *database.DB) *Publisher { return &Publisher{db: db} }
 func (p *Publisher) Publish(ctx context.Context, e eventbus.Event) error {
 	_, err := p.db.Q(ctx).Exec(ctx, `INSERT INTO outbox (id, topic, payload, actor_id, trace_id, version, occurred_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-		e.ID, e.Topic, []byte(e.Payload), e.ActorID, e.TraceID, e.Version, e.OccurredAt)
+		e.ID, e.Topic, string(e.Payload), e.ActorID, e.TraceID, e.Version, e.OccurredAt)
 	return err
 }
 

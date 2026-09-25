@@ -75,9 +75,11 @@ func (r Scans) List(ctx context.Context, f domain.ListFilter) ([]domain.Scan, er
 
 // SaveResult persists status and diagnosis.
 func (r Scans) SaveResult(ctx context.Context, s domain.Scan) error {
-	var diag []byte
+	var diag *string // jsonb travels as text: []byte would be sent as bytea in exec mode
 	if s.Diagnosis != nil {
-		diag, _ = json.Marshal(s.Diagnosis) // plain struct of strings/numbers
+		raw, _ := json.Marshal(s.Diagnosis) // plain struct of strings/numbers
+		text := string(raw)
+		diag = &text
 	}
 	_, err := r.DB.Q(ctx).Exec(ctx, `UPDATE diagnosis_scans SET status = $2, diagnosis = $3, updated_at = $4 WHERE id = $1`,
 		s.ID, string(s.Status), diag, s.UpdatedAt)
@@ -95,7 +97,7 @@ func (r Scans) RecordConflict(ctx context.Context, id, scanID string, loser, win
 	l, _ := json.Marshal(loser)
 	w, _ := json.Marshal(winner)
 	_, err := r.DB.Q(ctx).Exec(ctx, `INSERT INTO diagnosis_sync_audit (id, scan_id, loser, winner, received_at) VALUES ($1, $2, $3, $4, $5)`,
-		id, scanID, l, w, at)
+		id, scanID, string(l), string(w), at)
 	return err
 }
 

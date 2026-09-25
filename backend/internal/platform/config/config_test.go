@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"io/fs"
 	"os"
 	"reflect"
 	"strings"
@@ -34,6 +35,10 @@ func load(t *testing.T, src Source) (*Config, *errs.Error) {
 	return cfg, nil
 }
 
+func reader(fsys fs.FS) func(string) ([]byte, error) {
+	return func(name string) ([]byte, error) { return fs.ReadFile(fsys, name) }
+}
+
 func TestLoad_DefaultsApply(t *testing.T) {
 	cfg, e := load(t, Source{})
 	if e != nil {
@@ -49,9 +54,9 @@ func TestLoad_DefaultsApply(t *testing.T) {
 func TestLoad_PrecedenceDefaultsFileEnvFlags(t *testing.T) {
 	fsys := fstest.MapFS{"c.yaml": {Data: []byte("app:\n  name: from-file\nauth:\n  access_ttl: 20m\nhttp:\n  addr: ':1'\n")}}
 	cfg, e := load(t, Source{
-		FS:      fsys,
-		Args:    []string{"-config", "c.yaml", "-set", "http.addr=:3"},
-		Environ: []string{"AGRI_AUTH_ACCESS_TTL=30m", "AGRI_HTTP_ADDR=:2", "OTHER=1", "AGRI_NOEQUALS"},
+		ReadFile: reader(fsys),
+		Args:     []string{"-config", "c.yaml", "-set", "http.addr=:3"},
+		Environ:  []string{"AGRI_AUTH_ACCESS_TTL=30m", "AGRI_HTTP_ADDR=:2", "OTHER=1", "AGRI_NOEQUALS"},
 	})
 	if e != nil {
 		t.Fatal(Report(e))
@@ -62,7 +67,7 @@ func TestLoad_PrecedenceDefaultsFileEnvFlags(t *testing.T) {
 }
 
 func TestLoad_EmptyFileKeepsDefaults(t *testing.T) {
-	cfg, e := load(t, Source{FS: fstest.MapFS{"c.yaml": {Data: nil}}, Args: []string{"-config", "c.yaml"}})
+	cfg, e := load(t, Source{ReadFile: reader(fstest.MapFS{"c.yaml": {Data: nil}}), Args: []string{"-config", "c.yaml"}})
 	if e != nil || cfg.App.Name != "agrismart" {
 		t.Fatal(e)
 	}
@@ -82,11 +87,11 @@ func TestLoad_Errors(t *testing.T) {
 	}{
 		{"bad flag", Source{Args: []string{"-nope"}}, "flags"},
 		{"file disabled", Source{Args: []string{"-config", "x"}}, "config"},
-		{"missing file", Source{FS: fsys, Args: []string{"-config", "none"}}, "config"},
-		{"bad yaml", Source{FS: fsys, Args: []string{"-config", "bad.yaml"}}, "config"},
-		{"secret in file", Source{FS: fsys, Args: []string{"-config", "secret.yaml"}}, "auth.jwt_secret"},
-		{"unknown key in file", Source{FS: fsys, Args: []string{"-config", "unknown.yaml"}}, "config"},
-		{"scalar section", Source{FS: fsys, Args: []string{"-config", "scalar.yaml"}}, "config"},
+		{"missing file", Source{ReadFile: reader(fsys), Args: []string{"-config", "none"}}, "config"},
+		{"bad yaml", Source{ReadFile: reader(fsys), Args: []string{"-config", "bad.yaml"}}, "config"},
+		{"secret in file", Source{ReadFile: reader(fsys), Args: []string{"-config", "secret.yaml"}}, "auth.jwt_secret"},
+		{"unknown key in file", Source{ReadFile: reader(fsys), Args: []string{"-config", "unknown.yaml"}}, "config"},
+		{"scalar section", Source{ReadFile: reader(fsys), Args: []string{"-config", "scalar.yaml"}}, "config"},
 		{"bad env", Source{Environ: []string{"AGRI_HTTP_MAX_BODY_BYTES=x"}}, "http.max_body_bytes"},
 		{"unknown set", Source{Args: []string{"-set", "nope.x=1"}}, "nope.x"},
 		{"secret set", Source{Args: []string{"-set", "database.url=x"}}, "database.url"},
@@ -199,7 +204,7 @@ func TestExampleFiles_CoverEveryField(t *testing.T) {
 		}
 	}
 	// The example file must itself load cleanly.
-	cfg, e := load(t, Source{FS: os.DirFS("../../.."), Args: []string{"-config", "config.example.yaml"}})
+	cfg, e := load(t, Source{ReadFile: os.ReadFile, Args: []string{"-config", "../../../config.example.yaml"}})
 	if e != nil || cfg.HTTP.Addr != ":8080" {
 		t.Fatal(Report(e))
 	}

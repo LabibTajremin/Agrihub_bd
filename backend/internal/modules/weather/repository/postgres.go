@@ -29,6 +29,6 @@ func (r Observations) Put(ctx context.Context, o domain.Observation) error {
 	raw, _ := json.Marshal(o.Forecast)
 	_, err := r.DB.Q(ctx).Exec(ctx, `INSERT INTO weather_observations (cell_key, lat_e1, lng_e1, forecast, fetched_at) VALUES ($1, $2, $3, $4, $5)
 		ON CONFLICT (cell_key) DO UPDATE SET forecast = EXCLUDED.forecast, fetched_at = EXCLUDED.fetched_at`,
-		o.Cell.Key(), o.Cell.LatE1, o.Cell.LngE1, raw, o.FetchedAt)
+		o.Cell.Key(), o.Cell.LatE1, o.Cell.LngE1, string(raw), o.FetchedAt)
 	return err
 }

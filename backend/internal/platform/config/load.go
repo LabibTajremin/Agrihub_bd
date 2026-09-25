@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/fs"
 	"math"
 	"reflect"
 	"sort"
@@ -29,7 +28,8 @@ var ErrInvalid = errs.Validation("config.invalid")
 type Source struct {
 	Args    []string // command-line flags (without program name)
 	Environ []string // KEY=VALUE pairs
-	FS      fs.FS    // resolves the -config path; nil disables file loading
+	// ReadFile reads the -config path (os.ReadFile in production); nil disables file loading.
+	ReadFile func(name string) ([]byte, error)
 }
 
 // Field describes one leaf of the config tree.
@@ -109,7 +109,7 @@ func Load(src Source) (*Config, error) {
 	fields := Fields(cfg)
 	steps := []func() error{
 		func() error { return applyLayer(fields, defaultsLayer(fields)) },
-		func() error { return loadFile(src.FS, *file, cfg, fields) },
+		func() error { return loadFile(src.ReadFile, *file, cfg, fields) },
 		func() error { return applyLayer(fields, parseEnv(src.Environ)) },
 		func() error { return applySets(fields, sets) },
 		func() error { return Validate(cfg) },
@@ -143,14 +143,14 @@ func applySets(fields []Field, sets []string) error {
 	return nil
 }
 
-func loadFile(fsys fs.FS, name string, cfg *Config, fields []Field) error {
+func loadFile(read func(string) ([]byte, error), name string, cfg *Config, fields []Field) error {
 	if name == "" {
 		return nil
 	}
-	if fsys == nil {
+	if read == nil {
 		return ErrInvalid.WithField("config", "file loading disabled")
 	}
-	raw, err := fs.ReadFile(fsys, name)
+	raw, err := read(name)
 	if err != nil {
 		return ErrInvalid.Wrap(err).WithField("config", "unreadable")
 	}

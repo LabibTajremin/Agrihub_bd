@@ -98,3 +98,17 @@ Alert titles and bodies are dictionary keys (`alerts.<kind>.title|body`) with `p
 |---|---|---|---|
 | POST | `/v1/assistant/ask` | `assistant:ask` | `{lang, transcript?, audio_media_id?, context?}` → `{understood, intent, answer_key, params, follow_ups}` |
 Backed by `aiadapter.ConversationalAgent` (stub). See `docs/AI_INTEGRATION.md`.
+
+## Platform
+| Method | Path | Permission |
+|---|---|---|
+| GET | `/healthz` | public — liveness |
+| GET | `/readyz` | public — readiness (database) |
+| GET | `/v1/admin/metrics` | `metrics:read` |
+
+## OpenAPI
+`backend/openapi/openapi.yaml` is generated from the route table (`app.OpenAPI`): paths, parameters,
+request/response schemas (from the DTO structs), security and the required permission
+(`x-permission`). `TestOpenAPI_UpToDate` fails when it drifts — regenerate with `make openapi`.
+`TestErrorCatalogue_GoldenAndTranslated` pins every client-facing error code and asserts its message
+key exists in all seven dictionaries.

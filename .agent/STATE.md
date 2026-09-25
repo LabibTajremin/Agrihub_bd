@@ -2,7 +2,7 @@
 Updated: 2026-09-25
 Branch: claude/festive-maxwell-n5xdmi
 PR: #1 (draft)
-Last commit: phase 10
+Last commit: phase 11
 CI: pending
 
 ## PHASES
@@ -18,8 +18,8 @@ CI: pending
 | 7 | Diagnosis | done | 8704d16 |
 | 8 | Advisory | done | 361c350 |
 | 9 | Weather & Alert | done | ac99c43 |
-| 10 | AI adapter (OPEN SLOT) | done | (this) |
-| 11 | API assembly & deploy targets | todo | — |
+| 10 | AI adapter (OPEN SLOT) | done | de74f01 |
+| 11 | API assembly & deploy targets | done | (this) |
 | 12 | Flutter foundation | todo | — |
 | 13 | Flutter onboarding & auth | todo | — |
 | 14 | Flutter home & dashboard | todo | — |
@@ -29,10 +29,10 @@ CI: pending
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Phase 11: internal/app composition root (adapters between modules, router, outbox flush, workers), cmd/{api,migrate,seed}, api/index.go (Vercel), OpenAPI generator+diff test, error-catalogue golden + i18n key check, Dockerfile, docker-compose, vercel.json, health/ready, docs/{API,DEPLOYMENT}.md.
+Phase 12: Flutter foundation — theme tokens, DI, go_router, Dio (auth interceptor, refresh-on-401, retry), secure storage, local store, offline queue, runtime i18n with RTL; goldens.
 
 ## BLOCKERS
 none
 
 ## DECISIONS THIS PHASE
-- aiadapter/registry for provider selection; ai.provider validated at boot
+- jsonb as text (exec-mode bug) + harness in prod pool mode; flush after every request; ReadFile config

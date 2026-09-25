@@ -57,6 +57,9 @@ func PoolConfig(o Options) (*pgxpool.Config, error) {
 	return cfg, nil
 }
 
+// ErrUnavailable is returned when a transaction cannot start.
+var ErrUnavailable = errs.Unavailable("database.unavailable")
+
 // DB is the database handle used by repositories.
 type DB struct {
 	root Beginner
@@ -110,7 +113,7 @@ func (d *DB) WithinTx(ctx context.Context, fn func(ctx context.Context) error) (
 	}
 	tx, err := parent.Begin(ctx)
 	if err != nil {
-		return errs.Unavailable("database.unavailable").Wrap(err)
+		return ErrUnavailable.Wrap(err)
 	}
 	defer func() {
 		if err != nil {

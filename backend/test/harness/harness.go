@@ -106,8 +106,9 @@ func migratedPool(fsys fs.FS) (*pgxpool.Pool, error) {
 	if err := database.Migrate(dsn, fsys, "up"); err != nil {
 		return nil, err
 	}
-	cfg, _ := pgxpool.ParseConfig(dsn) // dsn was produced by createDatabase
-	cfg.MaxConns = MaxConns
+	// Same pool mode as production (pgbouncer-safe exec mode), so the suite
+	// catches encoding differences such as []byte → jsonb.
+	cfg, _ := database.PoolConfig(database.Options{URL: dsn, PoolMode: "transaction", MaxConns: MaxConns}) // dsn from createDatabase
 	return pgxpool.NewWithConfig(ctx, cfg)
 }
 

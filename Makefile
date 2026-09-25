@@ -41,7 +41,7 @@ coverage-gate:
 	cd $(BACKEND) && $(GO) run scripts/coverage_gate.go -profile coverage.out -threshold 100 -v
 
 run:
-	cd $(BACKEND) && $(GO) run ./cmd/api
+	cd $(BACKEND) && $(GO) run ./cmd/api -config config.example.yaml
 
 migrate:
 	cd $(BACKEND) && $(GO) run ./cmd/migrate up
@@ -50,7 +50,7 @@ seed:
 	cd $(BACKEND) && $(GO) run ./cmd/seed
 
 openapi:
-	cd $(BACKEND) && $(GO) test -count=1 ./internal/app -run TestOpenAPI -update
+	cd $(BACKEND) && $(GO) test -tags integration -count=1 ./internal/app -run "TestOpenAPI_UpToDate|TestErrorCatalogue" -update
 
 docker:
 	docker build -f deploy/docker/Dockerfile -t agrismart-api:local .
