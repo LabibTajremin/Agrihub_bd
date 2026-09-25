@@ -21,3 +21,13 @@ generated from the route table and diff-tested (Phase 11).
 | POST | `/v1/auth/logout` | `profile:read` | revokes the session |
 | GET | `/v1/me` | `profile:read` | profile |
 | PATCH | `/v1/me` | `profile:write` | `{name?, language?, district?}` |
+
+## Localization
+| Method | Path | Permission |
+|---|---|---|
+| GET | `/v1/i18n/languages` | public |
+| GET | `/v1/i18n/{lang}?since=` | public (ETag/304) |
+| PUT | `/v1/i18n/{lang}/entries` | `dictionary:write` |
+| GET | `/v1/voice/{lang}?since=` | public (ETag/304) |
+| PUT | `/v1/voice/{lang}/assets` | `voice:write` |
+See `docs/LOCALIZATION.md`.

@@ -54,3 +54,12 @@ One line per non-obvious choice: **decision** — rationale.
   returns the code in development.
 - **Harness pool raised to 60 connections; tests use distinct unique keys (phones) per open
   transaction** — concurrent uncommitted inserts on a unique key block each other.
+
+## Phase 4
+- **Dictionary tables use the spec's names (`dictionary_entries`, `voice_assets`, `languages`)**;
+  other modules prefix tables with the module name.
+- **Catalog is copy-on-write with a CAS loop** — concurrent publishers never lose an update.
+- **Voice ships with an empty manifest** — clips are recorded content, not generated; the app shows
+  the text and disables play until a clip exists (`common.audio_unavailable`).
+- **Seed dictionaries are authored once for the whole app (319 keys)** so later phases rarely touch
+  seven files; new keys are added to all seven in the phase that needs them.
