@@ -44,3 +44,12 @@ See `docs/LOCALIZATION.md`.
 
 Areas are sent as `value_milli` (thousandths of `unit` ∈ decimal, bigha, acre, hectare) and returned
 in every unit.
+
+## Media
+Upload flow: **ticket → PUT bytes → complete**.
+| Method | Path | Permission | Notes |
+|---|---|---|---|
+| POST | `/v1/media/tickets` | `media:upload` | `{content_type, size_bytes, checksum_sha256}` → `{media_id, upload_url, method:"PUT", headers, expires_at}` |
+| PUT | `upload_url` | signed URL | S3 presigned URL, or `/v1/media/blob/{key}` (local backend, HMAC-signed) |
+| POST | `/v1/media/{id}/complete` | `media:upload` (owner) | verifies size + SHA-256, computes the image dHash; mismatches are deleted |
+| GET | `/v1/media/{id}` | `media:read` (owner or `scan:read_any`) | metadata + presigned `download_url` |

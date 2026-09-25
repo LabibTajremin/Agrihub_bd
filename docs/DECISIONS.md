@@ -71,3 +71,10 @@ One line per non-obvious choice: **decision** — rationale.
 - **Crop catalogue is code, not a table** — immutable reference data, versioned with the code.
 - **Updates and deletes are owner-or-admin (`field:write_any`)**; officers and agronomists can read
   any field but not edit it.
+
+## Phase 6
+- **S3 contract tests use gofakes3 (in-process) instead of a MinIO container** — MinIO images are not
+  pullable from this environment; gofakes3 is deterministic and needs no network.
+- **Upload verification reads the blob back** (≤ `storage.max_upload_bytes`) to check SHA-256 and
+  compute the dHash — simple and correct for leaf photos; large media would stream instead.
+- **Router supports a per-route body limit** (`Route.MaxBodyBytes`) for binary uploads.

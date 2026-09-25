@@ -92,3 +92,13 @@ Swapping the in-process bus for NATS/Kafka at extraction time replaces the `Disp
   fractions in basis points). Seasons: `aman → boro → aus → aman`.
 - Other modules read farm data only through `farm.Module.Field(ctx, id) FieldView` and
   `farm.Module.Crops() []CropView`; the composition root adapts them to the consumer's own port.
+
+## Media storage
+- `media/domain.Storage` port with two adapters: `repository.S3` (minio-go; AWS S3, MinIO, R2) and
+  `repository.LocalDisk` (development). Both pass the same contract suite
+  (`repository/contract_test.go`); S3 runs against an in-process S3 server (gofakes3).
+- Clients upload directly to storage with a presigned URL; the API only verifies (`complete`).
+  The local backend mimics presigned URLs with HMAC-signed `/v1/media/blob/{key}` routes.
+- **Perceptual hash (dHash, 64-bit):** 9×8 box-averaged grayscale grid, one bit per horizontal
+  neighbour comparison; near-duplicate photos differ by a few bits (Hamming distance). It keys the
+  diagnosis result cache (§6.8).

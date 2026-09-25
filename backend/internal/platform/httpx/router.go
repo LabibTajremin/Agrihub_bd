@@ -37,6 +37,8 @@ type Route struct {
 	Request    any // request body DTO
 	Response   any // success body DTO; nil = no body
 	Status     int // success status; 0 = 200
+	// MaxBodyBytes overrides Options.MaxBodyBytes (e.g. binary uploads); 0 = default.
+	MaxBodyBytes int64
 }
 
 // Options configures the router.
@@ -118,8 +120,12 @@ func (rt *Router) wrap(r Route) http.Handler {
 	if r.Method != "" {
 		pattern = r.Method + " " + r.Path
 	}
+	limit := o.MaxBodyBytes
+	if r.MaxBodyBytes > 0 {
+		limit = r.MaxBodyBytes
+	}
 	final := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		req.Body = http.MaxBytesReader(w, req.Body, o.MaxBodyBytes)
+		req.Body = http.MaxBytesReader(w, req.Body, limit)
 		if err := r.Handler(w, req); err != nil {
 			WriteError(w, req, o.Logger, err)
 		}

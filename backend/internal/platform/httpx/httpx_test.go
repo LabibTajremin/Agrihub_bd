@@ -117,6 +117,10 @@ func newHarness(t *testing.T, limiter ratelimit.Limiter) *harness {
 		Route{Method: http.MethodGet, Path: "/silent", Handler: func(w http.ResponseWriter, r *http.Request) error {
 			return nil
 		}},
+		Route{Method: http.MethodPost, Path: "/big", MaxBodyBytes: 1 << 10, Handler: func(w http.ResponseWriter, r *http.Request) error {
+			var b body
+			return Decode(r, &b, v)
+		}},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -309,7 +313,10 @@ func TestRouter_DuplicateRouteRejectedAndRoutesListed(t *testing.T) {
 	if err := h.router.Mount(Route{Method: "GET", Path: "/ok"}); err == nil {
 		t.Fatal("duplicate must fail")
 	}
-	if len(h.router.Routes()) != 8 {
+	if rec := h.do("POST", "/big", `{"name":"`+strings.Repeat("x", 500)+`"}`, nil); rec.Code != 200 {
+		t.Fatal("per-route body limit", rec.Code, rec.Body.String())
+	}
+	if len(h.router.Routes()) != 9 {
 		t.Fatal(len(h.router.Routes()))
 	}
 }
