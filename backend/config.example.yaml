@@ -1,4 +1,92 @@
-# AgriSmart API configuration — every key is documented here (filled in by Phase 1).
+# AgriSmart API configuration. Every non-secret key is documented here with its
+# default. Precedence: defaults -> this file (-config path) -> AGRI_* env -> -set flags.
+# Secrets (database.url, redis.url, auth.jwt_secret, storage.*_key) come from env only;
+# see .env.example. A test asserts this file covers every config field.
+
 app:
-  # Deployment environment: development | test | production
-  env: development
+  name: agrismart                    # service name used in logs
+  env: development                   # development | test | production
+  base_url: http://localhost:8080    # public base URL (used for local presigned upload links)
+
+http:
+  addr: ":8080"                      # listen address (Docker/local target)
+  read_timeout: 10s
+  write_timeout: 30s
+  idle_timeout: 60s
+  request_timeout: 15s               # per-request context deadline (Timeout middleware)
+  shutdown_timeout: 20s              # graceful shutdown budget (Docker target only)
+  max_body_bytes: 1048576            # JSON request body limit
+  cors_allowed_origins: ["*"]        # list of allowed origins, "*" for any
+  trust_proxy_headers: true          # honour X-Forwarded-For / X-Real-IP
+  rate_limit_per_minute: 120         # token bucket per (principal, route class)
+  auth_rate_limit_per_minute: 20     # stricter bucket for /v1/auth/*
+
+database:
+  pool_mode: transaction             # transaction (pgbouncer/serverless) | session
+  max_conns: 10
+  min_conns: 0
+  connect_timeout: 5s
+  outbox_batch_size: 100             # events relayed per outbox flush
+  outbox_poll_interval: 2s           # background relay interval (Docker target only)
+
+redis: {}                            # redis.url is a secret (env); empty = in-memory fallback
+
+auth:
+  jwt_key_id: k1                     # "kid" header; rotate keys by changing this
+  issuer: agrismart
+  access_ttl: 15m
+  refresh_ttl: 720h                  # 30 days, rotating, reuse-detected
+  otp_ttl: 5m
+  otp_length: 6
+  otp_max_attempts: 5
+  otp_per_number_per_hour: 5
+  otp_per_ip_per_hour: 20
+  argon2_time: 1                     # argon2id iterations
+  argon2_memory_kib: 65536           # argon2id memory (KiB)
+  argon2_threads: 2
+  argon2_key_len: 32
+
+storage:
+  backend: local                     # local | s3 (any S3-compatible: MinIO, R2, S3)
+  local_dir: var/media               # root for the local-disk adapter
+  s3_endpoint: localhost:9000
+  s3_bucket: agrismart-media
+  s3_region: us-east-1
+  s3_use_ssl: false
+  presign_ttl: 15m                   # lifetime of upload/download URLs
+  max_upload_bytes: 8388608          # 8 MiB
+  allowed_content_types: [image/jpeg, image/png, audio/mpeg, audio/ogg]
+
+localization:
+  default_language: bn               # Bangla is the default language
+  cache_max_age: 300s                # Cache-Control max-age for dictionary snapshots
+
+ai:
+  provider: stub                     # OPEN SLOT: only "stub" ships; see docs/AI_INTEGRATION.md
+  min_diagnosis_confidence: 0.60     # >= shows treatment plan, < routes to low-confidence screen
+
+advisory:                            # crop suitability weights, must sum to 1.0
+  weight_soil: 0.30
+  weight_water: 0.25
+  weight_pest: 0.15
+  weight_market: 0.20
+  weight_seed: 0.10
+  top_n: 5                           # recommendations returned
+
+weather:
+  provider: stub                     # stub | http (Open-Meteo compatible)
+  base_url: https://api.open-meteo.com
+  http_timeout: 5s
+  stale_after: 3h                    # observations older than this are flagged stale
+  breaker_failure_threshold: 3       # consecutive failures before the breaker opens
+  breaker_open_timeout: 30s          # time before a half-open probe
+  breaker_half_open_max_calls: 1
+
+observability:
+  log_level: info                    # debug | info | warn | error
+  log_format: json                   # json | text
+  metrics_enabled: true
+
+features:
+  guest_mode: true                   # allow anonymous guest sessions (first scan without account)
+  expose_otp: false                  # return OTP in API response; forbidden in production

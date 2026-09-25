@@ -1,15 +1,15 @@
 # BUILD STATE
 Updated: 2026-09-25
 Branch: claude/festive-maxwell-n5xdmi
-PR: (opening)
-Last commit: phase 0
+PR: #1 (draft)
+Last commit: phase 1
 CI: pending
 
 ## PHASES
 | # | Name | Status | Commit |
 |---|------|--------|--------|
-| 0 | Bootstrap & guardrails | done | (this) |
-| 1 | Platform kernel | todo | — |
+| 0 | Bootstrap & guardrails | done | 6b0ac80 |
+| 1 | Platform kernel | done | (this) |
 | 2 | Persistence & migrations | todo | — |
 | 3 | Identity (auth + RBAC) | todo | — |
 | 4 | Localization (dictionary + voice) | todo | — |
@@ -29,10 +29,10 @@ CI: pending
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Phase 1: write backend/internal/platform/{config,logger,errs,validator,httpx,clock,idgen,cache,archtest}.
+Phase 2: platform/{database,tx,eventbus,outbox}, migrations/, test/ harness (testcontainers, per-test rollback).
 
 ## BLOCKERS
 none
 
 ## DECISIONS THIS PHASE
-- Branch is claude/festive-maxwell-n5xdmi (session-bound). See docs/DECISIONS.md.
+- Go 1.26; errs package name; domain may import platform/errs; aiadapter port importable (docs/DECISIONS.md)
