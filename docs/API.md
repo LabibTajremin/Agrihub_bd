@@ -92,3 +92,9 @@ Seasons: `aman` (Jul–Oct), `boro` (Nov–Feb), `aus` (Mar–Jun); default = th
 | POST | `/v1/alerts/{id}/read`, `/v1/alerts/read-all` | `alert:read` | |
 | GET/PUT/DELETE | `/v1/alerts/subscription` | `alert:read` / `subscription:write` | `{lat, lng, kinds[]}` kinds ∈ heavy_rain, heat, blast_risk, disease_followup |
 Alert titles and bodies are dictionary keys (`alerts.<kind>.title|body`) with `params`.
+
+## Assistant (open slot)
+| Method | Path | Permission | Notes |
+|---|---|---|---|
+| POST | `/v1/assistant/ask` | `assistant:ask` | `{lang, transcript?, audio_media_id?, context?}` → `{understood, intent, answer_key, params, follow_ups}` |
+Backed by `aiadapter.ConversationalAgent` (stub). See `docs/AI_INTEGRATION.md`.

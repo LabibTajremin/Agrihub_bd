@@ -2,7 +2,7 @@
 Updated: 2026-09-25
 Branch: claude/festive-maxwell-n5xdmi
 PR: #1 (draft)
-Last commit: phase 9
+Last commit: phase 10
 CI: pending
 
 ## PHASES
@@ -17,8 +17,8 @@ CI: pending
 | 6 | Media | done | d1a0b75 |
 | 7 | Diagnosis | done | 8704d16 |
 | 8 | Advisory | done | 361c350 |
-| 9 | Weather & Alert | done | (this) |
-| 10 | AI adapter (OPEN SLOT) | todo | — |
+| 9 | Weather & Alert | done | ac99c43 |
+| 10 | AI adapter (OPEN SLOT) | done | (this) |
 | 11 | API assembly & deploy targets | todo | — |
 | 12 | Flutter foundation | todo | — |
 | 13 | Flutter onboarding & auth | todo | — |
@@ -29,10 +29,10 @@ CI: pending
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Phase 10: aiadapter module (provider selection by config, POST /v1/assistant/ask route) + docs/AI_INTEGRATION.md.
+Phase 11: internal/app composition root (adapters between modules, router, outbox flush, workers), cmd/{api,migrate,seed}, api/index.go (Vercel), OpenAPI generator+diff test, error-catalogue golden + i18n key check, Dockerfile, docker-compose, vercel.json, health/ready, docs/{API,DEPLOYMENT}.md.
 
 ## BLOCKERS
 none
 
 ## DECISIONS THIS PHASE
-- cache refresh at stale_after/3; seasonal = climatology x anomaly; consumers decode own payloads
+- aiadapter/registry for provider selection; ai.provider validated at boot

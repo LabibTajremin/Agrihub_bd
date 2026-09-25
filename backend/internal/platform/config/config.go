@@ -101,7 +101,7 @@ type Localization struct {
 
 // AI selects the implementation behind the open-slot ports.
 type AI struct {
-	Provider               string  `yaml:"provider" default:"stub" validate:"oneof=stub"`
+	Provider               string  `yaml:"provider" default:"stub" validate:"required"` // validated against the registry at boot
 	MinDiagnosisConfidence float64 `yaml:"min_diagnosis_confidence" default:"0.60" validate:"gte=0,lte=1"`
 }
 

@@ -62,7 +62,7 @@ localization:
   cache_max_age: 300s                # Cache-Control max-age for dictionary snapshots
 
 ai:
-  provider: stub                     # OPEN SLOT: only "stub" ships; see docs/AI_INTEGRATION.md
+  provider: stub                     # OPEN SLOT: registered providers (aiadapter/registry); only "stub" ships
   min_diagnosis_confidence: 0.60     # >= shows treatment plan, < routes to low-confidence screen
 
 advisory:                            # crop suitability weights, must sum to 1.0

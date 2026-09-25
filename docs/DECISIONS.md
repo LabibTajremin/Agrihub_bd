@@ -103,3 +103,11 @@ One line per non-obvious choice: **decision** — rationale.
 - **Alert consumers reference topics by name, never other modules' types** — each consumer decodes
   its own payload struct, so extraction needs no shared code.
 - **Notifier failures are logged, not retried** — the alert is already stored and visible in the inbox.
+
+## Phase 10
+- **Provider selection lives in `aiadapter/registry`**, not in the port package — the stub imports the
+  port types, so the port package cannot import the stub (cycle); a registry keeps "swap = config".
+- **`ai.provider` is validated against the registry at boot**, not by a config `oneof` — registering a
+  model must not require editing the config validator.
+- **Bug fix + regression test:** OTP rejection sampling was only covered by chance (crypto/rand);
+  `TestRandomDigits_RejectionSamplingIsDeterministic` pins it.
