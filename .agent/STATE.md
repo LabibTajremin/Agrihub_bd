@@ -2,7 +2,7 @@
 Updated: 2026-09-25
 Branch: claude/festive-maxwell-n5xdmi
 PR: #1 (draft)
-Last commit: phase 6
+Last commit: phase 7
 CI: pending
 
 ## PHASES
@@ -14,8 +14,8 @@ CI: pending
 | 3 | Identity (auth + RBAC) | done | cbc3b7f |
 | 4 | Localization (dictionary + voice) | done | 901e9e0 |
 | 5 | Farm | done | 7f1c504 |
-| 6 | Media | done | (this) |
-| 7 | Diagnosis | todo | — |
+| 6 | Media | done | d1a0b75 |
+| 7 | Diagnosis | done | (this) |
 | 8 | Advisory | todo | — |
 | 9 | Weather & Alert | todo | — |
 | 10 | AI adapter (OPEN SLOT) | todo | — |
@@ -29,10 +29,10 @@ CI: pending
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Phase 7: aiadapter/port.go + stub first (needed by diagnosis), then modules/diagnosis (state machine, confidence routing, sync, LRU by phash).
+Phase 8: modules/advisory (MCDA scoring, heap top-N, yield+ROI integer poisha, rotation layered DAG, narration via aiadapter).
 
 ## BLOCKERS
 none
 
 ## DECISIONS THIS PHASE
-- gofakes3 for S3 contract; per-route body limit; blob read-back verification
+- aiadapter port+stub created early; failed analysis is a state; LWW audit table

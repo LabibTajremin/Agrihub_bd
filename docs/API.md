@@ -53,3 +53,17 @@ Upload flow: **ticket → PUT bytes → complete**.
 | PUT | `upload_url` | signed URL | S3 presigned URL, or `/v1/media/blob/{key}` (local backend, HMAC-signed) |
 | POST | `/v1/media/{id}/complete` | `media:upload` (owner) | verifies size + SHA-256, computes the image dHash; mismatches are deleted |
 | GET | `/v1/media/{id}` | `media:read` (owner or `scan:read_any`) | metadata + presigned `download_url` |
+
+## Diagnosis (Plant Doctor)
+| Method | Path | Permission | Notes |
+|---|---|---|---|
+| POST | `/v1/scans` | `scan:create` | `{media_id, crop_code, field_id?, idempotency_key, captured_at, lang?}` → 201 new, 200 replay |
+| GET | `/v1/scans?saved=&owner_id=&limit=&before=` | `scan:read` | newest first; `next_before` cursor |
+| GET | `/v1/scans/{id}` | `scan:read` | owner or `scan:read_any` |
+| PATCH | `/v1/scans/{id}` | `scan:create` (owner) | `{note?, saved?}` — last-write-wins, loser audited |
+| POST | `/v1/scans/{id}/retry` | `scan:create` (owner) | failed → queued → analysed again |
+| POST | `/v1/scans/sync` | `scan:sync` | offline queue `{operations:[{idempotency_key, seq, kind, create?/scan_id+annotation?}]}` |
+
+Scan `status`: `queued → analysing → completed | low_confidence | failed` (`failed → queued` on retry).
+`diagnosis.confidence ≥ ai.min_diagnosis_confidence (0.60)` → `completed` with chemical and organic
+plans (steps are dictionary keys); below → `low_confidence` (client shows the escalation screen).

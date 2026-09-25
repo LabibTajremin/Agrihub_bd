@@ -78,3 +78,12 @@ One line per non-obvious choice: **decision** — rationale.
 - **Upload verification reads the blob back** (≤ `storage.max_upload_bytes`) to check SHA-256 and
   compute the dHash — simple and correct for leaf photos; large media would stream instead.
 - **Router supports a per-route body limit** (`Route.MaxBodyBytes`) for binary uploads.
+
+## Phase 7
+- **`aiadapter` ports and stub were created in Phase 7** (diagnosis depends on them); Phase 10 adds
+  provider selection, the assistant endpoint and the integration guide.
+- **A failed analysis is a scan state, not an HTTP error** — the client receives `status: failed`
+  and may retry; the event `diagnosis.scan.failed` is published.
+- **Scan analysis is synchronous within the request** — works on serverless (no workers); the
+  engine port can later be backed by a queue without changing call sites.
+- **Diagnosis cache is shared across users** — a diagnosis of a leaf image is not personal data.

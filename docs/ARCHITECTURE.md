@@ -102,3 +102,18 @@ Swapping the in-process bus for NATS/Kafka at extraction time replaces the `Disp
 - **Perceptual hash (dHash, 64-bit):** 9×8 box-averaged grayscale grid, one bit per horizontal
   neighbour comparison; near-duplicate photos differ by a few bits (Hamming distance). It keys the
   diagnosis result cache (§6.8).
+
+## Diagnosis
+- **State machine** (`diagnosis/domain`): an explicit legal-transition table; every other transition
+  returns `scan.invalid_transition` (exhaustively table-tested).
+- **Analysis** runs outside any transaction (engine latency must not hold a DB connection); the routed
+  result and `diagnosis.scan.completed|failed` event are then written atomically.
+- **Result cache** (§6.8): bounded LRU keyed by the image dHash — a re-scan of the same leaf skips
+  the engine.
+- **Offline sync** (§6.7): the client sends its append-only queue (monotonic `seq`, UUIDv7
+  `idempotency_key`). Operations are applied in `seq` order; each outcome is stored in
+  `diagnosis_sync_ops`, so replaying a batch returns `duplicate` and changes nothing. Client errors
+  reject one operation; server errors fail the batch so the client retries it.
+- **Conflicts** on annotations (note / saved) resolve **last-write-wins by server-received time**; the
+  overwritten value is kept in `diagnosis_sync_audit` — nothing is silently discarded.
+- The AI is reached only through `aiadapter.DiagnosisEngine` (stub by default).
