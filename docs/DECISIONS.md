@@ -31,3 +31,13 @@ One line per non-obvious choice: **decision** — rationale.
 - **Rate limiter fails open** — a Redis outage degrades to the in-memory bucket, then to allow.
 - **Router uses stdlib `http.ServeMux` patterns** — no router dependency; unmatched paths return the
   standard JSON error body.
+
+## Phase 2
+- **Repositories read rows via `database.Collect` (pgx `CollectRows`)** — scan and iteration errors
+  surface through one return, keeping repositories nearly branch-free.
+- **Fault injection wraps a real `pgx.Tx`** — error branches are tested against real Postgres
+  rather than mocks.
+- **The harness keeps one container + one migrated DB per test binary in package state** — the only
+  shared mutable state in the codebase, confined to test support.
+- **Outbox relay runs per-event savepoints inside one locking transaction** — a failing consumer
+  is rolled back alone; its row records the attempt.

@@ -48,3 +48,23 @@ Errors returned by handlers are mapped by `httpx.WriteError` â€” the only Kindâ†
 | no-init / no-panic | no `init()` anywhere; no `panic` in modules |
 
 `TestArchitecture_PlantedViolationsAreCaught` runs the checker over a fixture that breaks every rule.
+
+## Persistence
+- `platform/database`: pgx pool. With `database.pool_mode=transaction` (default; required behind
+  pgbouncer/Neon/Supabase poolers) server-side statement caching is disabled.
+- Transactions travel in the context: `db.WithinTx(ctx, fn)`; repositories call `db.Q(ctx)` and
+  automatically join the active transaction. Nested `WithinTx` = savepoint.
+- Use cases depend only on `platform/tx.Manager` (no SQL types).
+- Migrations: `backend/migrations/NNNNNN_<module>_<change>.{up,down}.sql`, embedded and run by
+  `golang-migrate`. Each module owns its tables; no cross-module foreign keys or joins.
+
+## Events: transactional outbox
+1. A use case builds an event (`eventbus.Factory.New`) and publishes it through `outbox.Publisher`,
+   which INSERTs into `outbox` **in the same transaction** as the state change.
+2. `outbox.Relay.Flush` selects pending rows `FOR UPDATE SKIP LOCKED`, dispatches each to the
+   in-process `eventbus.Local` inside its own savepoint, and marks it dispatched (or records
+   `attempts`/`last_error`). Events stop retrying after `outbox.MaxAttempts`.
+3. Delivery is at-least-once; consumers must be idempotent.
+4. Flush runs after every request (both targets) and on a ticker (Docker target only).
+
+Swapping the in-process bus for NATS/Kafka at extraction time replaces the `Dispatcher` only.

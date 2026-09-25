@@ -2,15 +2,15 @@
 Updated: 2026-09-25
 Branch: claude/festive-maxwell-n5xdmi
 PR: #1 (draft)
-Last commit: phase 1
+Last commit: phase 2
 CI: pending
 
 ## PHASES
 | # | Name | Status | Commit |
 |---|------|--------|--------|
 | 0 | Bootstrap & guardrails | done | 6b0ac80 |
-| 1 | Platform kernel | done | (this) |
-| 2 | Persistence & migrations | todo | — |
+| 1 | Platform kernel | done | 04ec047 |
+| 2 | Persistence & migrations | done | (this) |
 | 3 | Identity (auth + RBAC) | todo | — |
 | 4 | Localization (dictionary + voice) | todo | — |
 | 5 | Farm | todo | — |
@@ -29,10 +29,10 @@ CI: pending
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Phase 2: platform/{database,tx,eventbus,outbox}, migrations/, test/ harness (testcontainers, per-test rollback).
+Phase 3: platform/{authn,authz} + modules/identity (OTP, argon2id, JWT kid, rotating refresh, guest).
 
 ## BLOCKERS
 none
 
 ## DECISIONS THIS PHASE
-- Go 1.26; errs package name; domain may import platform/errs; aiadapter port importable (docs/DECISIONS.md)
+- Repos use database.Collect; FaultyDB for error paths; harness shares 1 container per binary
