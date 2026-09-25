@@ -87,3 +87,10 @@ One line per non-obvious choice: **decision** — rationale.
 - **Scan analysis is synchronous within the request** — works on serverless (no workers); the
   engine port can later be backed by a queue without changing call sites.
 - **Diagnosis cache is shared across users** — a diagnosis of a leaf image is not personal data.
+
+## Phase 8
+- **Advisory routes live under `/v1/advisory/...`** — a path prefix per module keeps gateway routing
+  trivial when the module is extracted.
+- **Advisory owns no tables** — it is computation over farm, weather and AI ports.
+- **Rotation scores use each crop's first season's rainfall** — a crop appears once per plan layer; a
+  per-layer score adds complexity without changing typical plans.

@@ -2,7 +2,7 @@
 Updated: 2026-09-25
 Branch: claude/festive-maxwell-n5xdmi
 PR: #1 (draft)
-Last commit: phase 7
+Last commit: phase 8
 CI: pending
 
 ## PHASES
@@ -15,8 +15,8 @@ CI: pending
 | 4 | Localization (dictionary + voice) | done | 901e9e0 |
 | 5 | Farm | done | 7f1c504 |
 | 6 | Media | done | d1a0b75 |
-| 7 | Diagnosis | done | (this) |
-| 8 | Advisory | todo | — |
+| 7 | Diagnosis | done | 8704d16 |
+| 8 | Advisory | done | (this) |
 | 9 | Weather & Alert | todo | — |
 | 10 | AI adapter (OPEN SLOT) | todo | — |
 | 11 | API assembly & deploy targets | todo | — |
@@ -29,10 +29,10 @@ CI: pending
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Phase 8: modules/advisory (MCDA scoring, heap top-N, yield+ROI integer poisha, rotation layered DAG, narration via aiadapter).
+Phase 9: platform/breaker + modules/weather (provider port, stub + Open-Meteo HTTP adapter behind breaker, observation cache w/ data_age) + modules/alert (rules on events, subscriptions, read/unread, notifier port stub).
 
 ## BLOCKERS
 none
 
 ## DECISIONS THIS PHASE
-- aiadapter port+stub created early; failed analysis is a state; LWW audit table
+- /v1/advisory prefix; advisory stateless; FieldView.AreaNano added

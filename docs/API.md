@@ -67,3 +67,13 @@ Upload flow: **ticket → PUT bytes → complete**.
 Scan `status`: `queued → analysing → completed | low_confidence | failed` (`failed → queued` on retry).
 `diagnosis.confidence ≥ ai.min_diagnosis_confidence (0.60)` → `completed` with chemical and organic
 plans (steps are dictionary keys); below → `low_confidence` (client shows the escalation screen).
+
+## Advisory (Crop Advisor)
+| Method | Path | Permission | Notes |
+|---|---|---|---|
+| GET | `/v1/advisory/fields/{id}/recommendations?season=` | `advisory:read` + field access | top-N crops, criteria breakdown, yield |
+| GET | `/v1/advisory/fields/{id}/crops/{code}?season=` | same | score, yield, default ROI |
+| POST | `/v1/advisory/fields/{id}/crops/{code}/roi` | same | `{costs_poisha?}` — integer poisha |
+| GET | `/v1/advisory/fields/{id}/rotation?start=&seasons=` | same | nitrogen-balanced plan (1–6 seasons) |
+| POST | `/v1/advisory/narrate` | `advisory:read` | `{chart, lang, data}` → `{text_key, voice_key}` via the AI port |
+Seasons: `aman` (Jul–Oct), `boro` (Nov–Feb), `aus` (Mar–Jun); default = the current season.

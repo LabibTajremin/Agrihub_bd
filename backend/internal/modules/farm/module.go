@@ -60,6 +60,7 @@ type FieldView struct {
 	Irrigation  string
 	Lat, Lng    float64
 	AreaHectare float64
+	AreaNano    int64 // exact area in 1e-9 m²
 	Soil        *SoilView
 	CropCodes   []string // crops currently on the field's plots
 }
@@ -71,7 +72,7 @@ func (m *Module) Field(ctx context.Context, id string) (FieldView, error) {
 		return FieldView{}, err
 	}
 	v := FieldView{ID: f.ID, OwnerID: f.OwnerID, District: f.District, Irrigation: f.Irrigation,
-		Lat: f.Location.Lat(), Lng: f.Location.Lng(), AreaHectare: f.Area.Hectares()}
+		Lat: f.Location.Lat(), Lng: f.Location.Lng(), AreaHectare: f.Area.Hectares(), AreaNano: f.Area.Nano()}
 	if f.Soil != nil {
 		v.Soil = &SoilView{Texture: string(f.Soil.Texture), PHx10: f.Soil.PHx10, NitrogenKgHa: f.Soil.NitrogenKgHa}
 	}

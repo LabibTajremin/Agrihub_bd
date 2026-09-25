@@ -117,3 +117,19 @@ Swapping the in-process bus for NATS/Kafka at extraction time replaces the `Disp
 - **Conflicts** on annotations (note / saved) resolve **last-write-wins by server-received time**; the
   overwritten value is kept in `diagnosis_sync_audit` — nothing is silently discarded.
 - The AI is reached only through `aiadapter.DiagnosisEngine` (stub by default).
+
+## Advisory algorithms (`advisory/domain`, pure functions)
+- **Scoring (§6.3):** criteria soil (texture 60% + pH 40%), water (rain + irrigation vs need, with a
+  waterlogging penalty), pest (1 − risk), market, seed — each in [0,1];
+  `score = 100·Σ wᵢ·criterionᵢ`. Weights come from `advisory.*` config and are validated to sum to
+  1.0 at boot (`advisory.New`). Property tests assert every criterion ∈ [0,1] and score ∈ [0,100].
+- **Ranking (§6.4):** bounded min-heap (`container/heap`) keeps the best N in O(n log N); ties break
+  on crop code. A property test compares it with a full sort.
+- **Yield & ROI (§6.6):** per-hectare catalogue values scaled to the exact field area with 128-bit
+  integer math; money in poisha; `net = gross − Σcosts` (property-tested).
+- **Rotation (§6.5):** seasons expand into a layered DAG (layer 0 = current crop). Kahn's topological
+  sort guards against cycles (`advisory.rotation_cycle`, never loops); a greedy pass picks, per
+  season, the best-scoring crop that keeps soil nitrogen ≥ 0, else the most nitrogen-restoring one
+  (flagging `nitrogen_deficit`).
+- Weather unavailable → climatological rainfall with `stale: true` (never an error).
+- Golden files pin recommendations and rotation for a fixed field (`advisory/testdata`).
