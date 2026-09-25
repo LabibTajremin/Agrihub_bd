@@ -106,8 +106,14 @@ func migratedPool(fsys fs.FS) (*pgxpool.Pool, error) {
 	if err := database.Migrate(dsn, fsys, "up"); err != nil {
 		return nil, err
 	}
-	return pgxpool.New(ctx, dsn)
+	cfg, _ := pgxpool.ParseConfig(dsn) // dsn was produced by createDatabase
+	cfg.MaxConns = MaxConns
+	return pgxpool.NewWithConfig(ctx, cfg)
 }
+
+// MaxConns bounds the shared pool; each harness.DB holds one connection until
+// its test ends, so tests may open many.
+const MaxConns = 60
 
 // Pool returns the process-wide migrated pool.
 func Pool(t testing.TB) *pgxpool.Pool {

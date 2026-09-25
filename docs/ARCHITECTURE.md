@@ -68,3 +68,16 @@ Errors returned by handlers are mapped by `httpx.WriteError` — the only Kind�
 4. Flush runs after every request (both targets) and on a ticker (Docker target only).
 
 Swapping the in-process bus for NATS/Kafka at extraction time replaces the `Dispatcher` only.
+
+## Authentication & authorization
+- **OTP**: 6 digits, 5-min TTL, argon2id-hashed at rest, max 5 attempts (failed attempts are
+  committed even though the request fails), rate-limited per number and per IP.
+- **Access token**: HS256 JWT (15 min) with `kid` header; claims `sub, sid, role, perms, iat, exp, jti`.
+  Verification accepts any configured kid, so rotating to a new key (or RS256) is configuration.
+- **Refresh token**: 256-bit random, stored as SHA-256, rotating. A session is a token family; presenting
+  a used token revokes the whole family (`auth.refresh_reused`).
+- **Guest**: `POST /v1/auth/guest` creates a guest account; signing in later upgrades it in place so
+  its data keeps its owner.
+- **RBAC**: roles `guest ⊂ farmer ⊂ field_officer ⊂ agronomist ⊂ admin`; static matrix in
+  `platform/authz` (golden file `testdata/matrix.golden`). Use cases call `authn.Require(ctx, perm)`;
+  ownership rules use `authz.Owned(role, subject, owner, ownPerm, anyPerm)`.

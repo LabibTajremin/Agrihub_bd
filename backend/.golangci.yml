@@ -40,6 +40,9 @@ linters:
     presets: [std-error-handling]
     rules:
       - path: _test\.go
+        text: ST1012
+        linters: [staticcheck]
+      - path: _test\.go
         linters: [gosec, noctx, bodyclose, errcheck, gocritic, errorlint, sqlclosecheck]
 formatters:
   enable: [gofmt, goimports]

@@ -2,7 +2,7 @@
 Updated: 2026-09-25
 Branch: claude/festive-maxwell-n5xdmi
 PR: #1 (draft)
-Last commit: phase 2
+Last commit: phase 3
 CI: pending
 
 ## PHASES
@@ -10,8 +10,8 @@ CI: pending
 |---|------|--------|--------|
 | 0 | Bootstrap & guardrails | done | 6b0ac80 |
 | 1 | Platform kernel | done | 04ec047 |
-| 2 | Persistence & migrations | done | (this) |
-| 3 | Identity (auth + RBAC) | todo | — |
+| 2 | Persistence & migrations | done | cb5e536 |
+| 3 | Identity (auth + RBAC) | done | (this) |
 | 4 | Localization (dictionary + voice) | todo | — |
 | 5 | Farm | todo | — |
 | 6 | Media | todo | — |
@@ -29,10 +29,10 @@ CI: pending
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Phase 3: platform/{authn,authz} + modules/identity (OTP, argon2id, JWT kid, rotating refresh, guest).
+Phase 4: modules/localization (languages, dictionary snapshot atomic.Pointer, delta+ETag, voice manifest, seed JSON x7).
 
 ## BLOCKERS
 none
 
 ## DECISIONS THIS PHASE
-- Repos use database.Collect; FaultyDB for error paths; harness shares 1 container per binary
+- use-case tests on real repos in rolled-back tx; guest endpoint; kernel.Kernel bundles platform deps

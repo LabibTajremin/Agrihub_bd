@@ -41,3 +41,16 @@ One line per non-obvious choice: **decision** — rationale.
   shared mutable state in the codebase, confined to test support.
 - **Outbox relay runs per-event savepoints inside one locking transaction** — a failing consumer
   is rolled back alone; its row records the attempt.
+
+## Phase 3
+- **Use cases are tested against real repositories inside rolled-back transactions** (plus fakes for
+  SMS/limiter/issuer and fault injection for storage) instead of hand-written in-memory repository
+  fakes — the same guarantees with half the code, and the SQL is exercised too.
+- **`POST /v1/auth/guest`** added — guest mode needs an identity for guest-owned scans.
+- **Failure writes that must survive an error (OTP attempts, family revocation) commit first, then the
+  use case returns the error.**
+- **Refresh tokens hashed with SHA-256, OTP codes with argon2id** — tokens are high-entropy; codes are not.
+- **SMS is a port with a logging stub** — provider integration is out of scope; `features.expose_otp`
+  returns the code in development.
+- **Harness pool raised to 60 connections; tests use distinct unique keys (phones) per open
+  transaction** — concurrent uncommitted inserts on a unique key block each other.
