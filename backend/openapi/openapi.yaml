@@ -1,0 +1,2383 @@
+components:
+    schemas:
+        advisory.Criteria:
+            properties:
+                market:
+                    type: number
+                pest:
+                    type: number
+                seed:
+                    type: number
+                soil:
+                    type: number
+                water:
+                    type: number
+            type: object
+        advisory.CropDetail:
+            properties:
+                criteria:
+                    $ref: '#/components/schemas/advisory.Criteria'
+                crop_code:
+                    type: string
+                name_key:
+                    type: string
+                outlook:
+                    $ref: '#/components/schemas/advisory.Outlook'
+                roi:
+                    $ref: '#/components/schemas/advisory.ROI'
+                score:
+                    type: number
+                season:
+                    type: string
+                yield_kg:
+                    $ref: '#/components/schemas/advisory.Triple'
+            type: object
+        advisory.NarrateRequest:
+            properties:
+                chart:
+                    type: string
+                data:
+                    additionalProperties:
+                        type: number
+                    type: object
+                lang:
+                    type: string
+            required:
+                - chart
+                - lang
+            type: object
+        advisory.Narration:
+            properties:
+                params:
+                    additionalProperties:
+                        type: string
+                    type: object
+                text:
+                    type: string
+                text_key:
+                    type: string
+                voice_key:
+                    type: string
+            type: object
+        advisory.Outlook:
+            properties:
+                data_age_seconds:
+                    format: int64
+                    type: integer
+                rain_mm:
+                    format: int64
+                    type: integer
+                stale:
+                    type: boolean
+            type: object
+        advisory.ROI:
+            properties:
+                costs_poisha:
+                    additionalProperties:
+                        format: int64
+                        type: integer
+                    type: object
+                gross_poisha:
+                    $ref: '#/components/schemas/advisory.Triple'
+                net_poisha:
+                    $ref: '#/components/schemas/advisory.Triple'
+                return_bp:
+                    format: int64
+                    type: integer
+                total_cost_poisha:
+                    format: int64
+                    type: integer
+                yield_kg:
+                    $ref: '#/components/schemas/advisory.Triple'
+            type: object
+        advisory.ROIRequest:
+            properties:
+                costs_poisha:
+                    additionalProperties:
+                        format: int64
+                        type: integer
+                    type: object
+            type: object
+        advisory.Recommendation:
+            properties:
+                criteria:
+                    $ref: '#/components/schemas/advisory.Criteria'
+                crop_code:
+                    type: string
+                name_key:
+                    type: string
+                score:
+                    type: number
+                yield_kg:
+                    $ref: '#/components/schemas/advisory.Triple'
+            type: object
+        advisory.Recommendations:
+            properties:
+                items:
+                    items:
+                        $ref: '#/components/schemas/advisory.Recommendation'
+                    type: array
+                outlook:
+                    $ref: '#/components/schemas/advisory.Outlook'
+                season:
+                    type: string
+            type: object
+        advisory.Rotation:
+            properties:
+                nitrogen_deficit:
+                    type: boolean
+                steps:
+                    items:
+                        $ref: '#/components/schemas/advisory.RotationStep'
+                    type: array
+            type: object
+        advisory.RotationStep:
+            properties:
+                crop_code:
+                    type: string
+                name_key:
+                    type: string
+                nitrogen_after_kg_ha:
+                    format: int64
+                    type: integer
+                nitrogen_before_kg_ha:
+                    format: int64
+                    type: integer
+                score:
+                    type: number
+                season:
+                    type: string
+            type: object
+        advisory.Triple:
+            properties:
+                high:
+                    format: int64
+                    type: integer
+                likely:
+                    format: int64
+                    type: integer
+                low:
+                    format: int64
+                    type: integer
+            type: object
+        alert.Alert:
+            properties:
+                body_key:
+                    type: string
+                created_at:
+                    format: date-time
+                    type: string
+                id:
+                    type: string
+                kind:
+                    type: string
+                params:
+                    additionalProperties:
+                        type: string
+                    type: object
+                read_at:
+                    format: date-time
+                    nullable: true
+                    type: string
+                severity:
+                    type: string
+                title_key:
+                    type: string
+            type: object
+        alert.Inbox:
+            properties:
+                alerts:
+                    items:
+                        $ref: '#/components/schemas/alert.Alert'
+                    type: array
+                unread_count:
+                    format: int64
+                    type: integer
+            type: object
+        alert.ReadAll:
+            properties:
+                updated:
+                    format: int64
+                    type: integer
+            type: object
+        alert.Subscription:
+            properties:
+                cell_key:
+                    type: string
+                kinds:
+                    items:
+                        type: string
+                    type: array
+                lat:
+                    type: number
+                lng:
+                    type: number
+                updated_at:
+                    format: date-time
+                    type: string
+            type: object
+        alert.SubscriptionRequest:
+            properties:
+                kinds:
+                    items:
+                        type: string
+                    type: array
+                lat:
+                    type: number
+                lng:
+                    type: number
+            required:
+                - kinds
+            type: object
+        app.Health:
+            properties:
+                status:
+                    type: string
+                time:
+                    format: date-time
+                    type: string
+            type: object
+        app.MetricsSnapshot:
+            properties:
+                series:
+                    items:
+                        $ref: '#/components/schemas/metrics.Series'
+                    type: array
+            type: object
+        assistant.AskRequest:
+            properties:
+                audio_media_id:
+                    type: string
+                context:
+                    additionalProperties:
+                        type: string
+                    type: object
+                lang:
+                    type: string
+                transcript:
+                    type: string
+            required:
+                - lang
+            type: object
+        assistant.AskResponse:
+            properties:
+                answer_key:
+                    type: string
+                follow_ups:
+                    items:
+                        type: string
+                    type: array
+                intent:
+                    type: string
+                params:
+                    additionalProperties:
+                        type: string
+                    type: object
+                understood:
+                    type: boolean
+            type: object
+        diagnosis.AnnotateRequest:
+            properties:
+                note:
+                    nullable: true
+                    type: string
+                saved:
+                    nullable: true
+                    type: boolean
+            type: object
+        diagnosis.CreateScanRequest:
+            properties:
+                captured_at:
+                    format: date-time
+                    type: string
+                crop_code:
+                    type: string
+                field_id:
+                    type: string
+                idempotency_key:
+                    type: string
+                lang:
+                    type: string
+                media_id:
+                    type: string
+            required:
+                - crop_code
+                - media_id
+            type: object
+        diagnosis.Diagnosis:
+            properties:
+                confidence:
+                    type: number
+                description_key:
+                    type: string
+                disease_code:
+                    type: string
+                healthy:
+                    type: boolean
+                model_version:
+                    type: string
+                name_key:
+                    type: string
+                plans:
+                    items:
+                        $ref: '#/components/schemas/diagnosis.Plan'
+                    type: array
+                severity:
+                    type: string
+            type: object
+        diagnosis.Plan:
+            properties:
+                safety_key:
+                    type: string
+                steps:
+                    items:
+                        type: string
+                    type: array
+                variant:
+                    type: string
+            type: object
+        diagnosis.Scan:
+            properties:
+                captured_at:
+                    format: date-time
+                    type: string
+                created_at:
+                    format: date-time
+                    type: string
+                crop_code:
+                    type: string
+                diagnosis:
+                    allOf:
+                        - $ref: '#/components/schemas/diagnosis.Diagnosis'
+                    nullable: true
+                field_id:
+                    type: string
+                id:
+                    type: string
+                media_id:
+                    type: string
+                note:
+                    type: string
+                saved:
+                    type: boolean
+                status:
+                    type: string
+                updated_at:
+                    format: date-time
+                    type: string
+            type: object
+        diagnosis.ScanList:
+            properties:
+                next_before:
+                    format: date-time
+                    nullable: true
+                    type: string
+                scans:
+                    items:
+                        $ref: '#/components/schemas/diagnosis.Scan'
+                    type: array
+            type: object
+        diagnosis.SyncOperation:
+            properties:
+                annotation:
+                    allOf:
+                        - $ref: '#/components/schemas/diagnosis.AnnotateRequest'
+                    nullable: true
+                create:
+                    allOf:
+                        - $ref: '#/components/schemas/diagnosis.CreateScanRequest'
+                    nullable: true
+                idempotency_key:
+                    type: string
+                kind:
+                    type: string
+                scan_id:
+                    type: string
+                seq:
+                    format: int64
+                    type: integer
+            required:
+                - idempotency_key
+            type: object
+        diagnosis.SyncRequest:
+            properties:
+                operations:
+                    items:
+                        $ref: '#/components/schemas/diagnosis.SyncOperation'
+                    type: array
+            required:
+                - operations
+            type: object
+        diagnosis.SyncResponse:
+            properties:
+                results:
+                    items:
+                        $ref: '#/components/schemas/diagnosis.SyncResult'
+                    type: array
+            type: object
+        diagnosis.SyncResult:
+            properties:
+                error_code:
+                    type: string
+                idempotency_key:
+                    type: string
+                outcome:
+                    type: string
+                scan_id:
+                    type: string
+            type: object
+        farm.Area:
+            properties:
+                acre_milli:
+                    format: int64
+                    type: integer
+                bigha_milli:
+                    format: int64
+                    type: integer
+                decimal_milli:
+                    format: int64
+                    type: integer
+                hectare_milli:
+                    format: int64
+                    type: integer
+                unit:
+                    type: string
+                value_milli:
+                    format: int64
+                    type: integer
+            type: object
+        farm.AreaIn:
+            properties:
+                unit:
+                    type: string
+                value_milli:
+                    format: int64
+                    type: integer
+            type: object
+        farm.Crop:
+            properties:
+                code:
+                    type: string
+                cost_poisha_per_ha:
+                    additionalProperties:
+                        format: int64
+                        type: integer
+                    type: object
+                duration_days:
+                    format: int64
+                    type: integer
+                name_key:
+                    type: string
+                nitrogen_delta_kg_ha:
+                    format: int64
+                    type: integer
+                ph_max:
+                    type: number
+                ph_min:
+                    type: number
+                price_poisha_per_kg:
+                    format: int64
+                    type: integer
+                seasons:
+                    items:
+                        type: string
+                    type: array
+                textures:
+                    items:
+                        type: string
+                    type: array
+                water_need_mm:
+                    format: int64
+                    type: integer
+                yield_kg_ha:
+                    $ref: '#/components/schemas/farm.Yield'
+            type: object
+        farm.CropList:
+            properties:
+                crops:
+                    items:
+                        $ref: '#/components/schemas/farm.Crop'
+                    type: array
+            type: object
+        farm.Field:
+            properties:
+                area:
+                    $ref: '#/components/schemas/farm.Area'
+                created_at:
+                    format: date-time
+                    type: string
+                district:
+                    type: string
+                id:
+                    type: string
+                irrigation:
+                    type: string
+                location:
+                    $ref: '#/components/schemas/farm.Location'
+                name:
+                    type: string
+                owner_id:
+                    type: string
+                plots:
+                    items:
+                        $ref: '#/components/schemas/farm.Plot'
+                    type: array
+                soil:
+                    allOf:
+                        - $ref: '#/components/schemas/farm.Soil'
+                    nullable: true
+                updated_at:
+                    format: date-time
+                    type: string
+            type: object
+        farm.FieldList:
+            properties:
+                fields:
+                    items:
+                        $ref: '#/components/schemas/farm.Field'
+                    type: array
+            type: object
+        farm.FieldPatchRequest:
+            properties:
+                area:
+                    allOf:
+                        - $ref: '#/components/schemas/farm.AreaIn'
+                    nullable: true
+                district:
+                    nullable: true
+                    type: string
+                irrigation:
+                    nullable: true
+                    type: string
+                location:
+                    allOf:
+                        - $ref: '#/components/schemas/farm.Location'
+                    nullable: true
+                name:
+                    nullable: true
+                    type: string
+            type: object
+        farm.FieldRequest:
+            properties:
+                area:
+                    $ref: '#/components/schemas/farm.AreaIn'
+                district:
+                    type: string
+                irrigation:
+                    type: string
+                location:
+                    $ref: '#/components/schemas/farm.Location'
+                name:
+                    type: string
+                soil:
+                    allOf:
+                        - $ref: '#/components/schemas/farm.Soil'
+                    nullable: true
+            required:
+                - name
+            type: object
+        farm.Location:
+            properties:
+                lat:
+                    type: number
+                lng:
+                    type: number
+            type: object
+        farm.Plot:
+            properties:
+                area:
+                    $ref: '#/components/schemas/farm.Area'
+                crop_code:
+                    type: string
+                id:
+                    type: string
+                name:
+                    type: string
+                sown_on:
+                    format: date-time
+                    nullable: true
+                    type: string
+            type: object
+        farm.PlotRequest:
+            properties:
+                area:
+                    $ref: '#/components/schemas/farm.AreaIn'
+                crop_code:
+                    type: string
+                name:
+                    type: string
+                sown_on:
+                    format: date-time
+                    nullable: true
+                    type: string
+            required:
+                - crop_code
+                - name
+            type: object
+        farm.Soil:
+            properties:
+                nitrogen_kg_ha:
+                    format: int64
+                    type: integer
+                organic_matter_pct:
+                    type: number
+                ph:
+                    type: number
+                phosphorus_kg_ha:
+                    format: int64
+                    type: integer
+                potassium_kg_ha:
+                    format: int64
+                    type: integer
+                tested_on:
+                    format: date-time
+                    nullable: true
+                    type: string
+                texture:
+                    type: string
+            type: object
+        farm.Yield:
+            properties:
+                high:
+                    format: int64
+                    type: integer
+                likely:
+                    format: int64
+                    type: integer
+                low:
+                    format: int64
+                    type: integer
+            type: object
+        httpx.ErrorBody:
+            properties:
+                error:
+                    $ref: '#/components/schemas/httpx.ErrorDetail'
+            type: object
+        httpx.ErrorDetail:
+            properties:
+                code:
+                    type: string
+                fields:
+                    additionalProperties:
+                        type: string
+                    type: object
+                message:
+                    type: string
+                request_id:
+                    type: string
+            type: object
+        identity.OTPRequested:
+            properties:
+                dev_code:
+                    type: string
+                expires_at:
+                    format: date-time
+                    type: string
+            type: object
+        identity.PhoneRequest:
+            properties:
+                phone:
+                    type: string
+            required:
+                - phone
+            type: object
+        identity.RefreshRequest:
+            properties:
+                refresh_token:
+                    type: string
+            required:
+                - refresh_token
+            type: object
+        identity.Session:
+            properties:
+                access_token:
+                    type: string
+                expires_at:
+                    format: date-time
+                    type: string
+                refresh_expires_at:
+                    format: date-time
+                    type: string
+                refresh_token:
+                    type: string
+                token_type:
+                    type: string
+                user:
+                    $ref: '#/components/schemas/identity.User'
+            type: object
+        identity.Tokens:
+            properties:
+                access_token:
+                    type: string
+                expires_at:
+                    format: date-time
+                    type: string
+                refresh_expires_at:
+                    format: date-time
+                    type: string
+                refresh_token:
+                    type: string
+                token_type:
+                    type: string
+            type: object
+        identity.UpdateMeRequest:
+            properties:
+                district:
+                    nullable: true
+                    type: string
+                language:
+                    nullable: true
+                    type: string
+                name:
+                    nullable: true
+                    type: string
+            type: object
+        identity.User:
+            properties:
+                created_at:
+                    format: date-time
+                    type: string
+                district:
+                    type: string
+                id:
+                    type: string
+                language:
+                    type: string
+                name:
+                    type: string
+                phone:
+                    type: string
+                role:
+                    type: string
+            type: object
+        identity.VerifyRequest:
+            properties:
+                code:
+                    type: string
+                phone:
+                    type: string
+            required:
+                - code
+                - phone
+            type: object
+        localization.Clip:
+            properties:
+                checksum:
+                    type: string
+                duration_ms:
+                    format: int64
+                    type: integer
+                url:
+                    type: string
+            type: object
+        localization.Dictionary:
+            properties:
+                entries:
+                    additionalProperties:
+                        type: string
+                    type: object
+                full:
+                    type: boolean
+                lang:
+                    type: string
+                version:
+                    format: int64
+                    type: integer
+            type: object
+        localization.Language:
+            properties:
+                code:
+                    type: string
+                has_voice:
+                    type: boolean
+                is_default:
+                    type: boolean
+                is_rtl:
+                    type: boolean
+                name:
+                    type: string
+                native_name:
+                    type: string
+                version:
+                    format: int64
+                    type: integer
+            type: object
+        localization.Languages:
+            properties:
+                languages:
+                    items:
+                        $ref: '#/components/schemas/localization.Language'
+                    type: array
+            type: object
+        localization.UpsertEntriesRequest:
+            properties:
+                entries:
+                    additionalProperties:
+                        type: string
+                    type: object
+            required:
+                - entries
+            type: object
+        localization.UpsertResponse:
+            properties:
+                changed:
+                    format: int64
+                    type: integer
+                version:
+                    format: int64
+                    type: integer
+            type: object
+        localization.UpsertVoiceRequest:
+            properties:
+                assets:
+                    items:
+                        $ref: '#/components/schemas/localization.VoiceAssetInput'
+                    type: array
+            required:
+                - assets
+            type: object
+        localization.VoiceAssetInput:
+            properties:
+                checksum:
+                    type: string
+                duration_ms:
+                    format: int64
+                    type: integer
+                key:
+                    type: string
+                media_id:
+                    type: string
+                url:
+                    type: string
+            required:
+                - checksum
+                - key
+                - url
+            type: object
+        localization.VoiceManifest:
+            properties:
+                clips:
+                    additionalProperties:
+                        $ref: '#/components/schemas/localization.Clip'
+                    type: object
+                full:
+                    type: boolean
+                lang:
+                    type: string
+                version:
+                    format: int64
+                    type: integer
+            type: object
+        media.Object:
+            properties:
+                checksum_sha256:
+                    type: string
+                content_type:
+                    type: string
+                created_at:
+                    format: date-time
+                    type: string
+                download_url:
+                    type: string
+                id:
+                    type: string
+                phash:
+                    type: string
+                size_bytes:
+                    format: int64
+                    type: integer
+                status:
+                    type: string
+                uploaded_at:
+                    format: date-time
+                    nullable: true
+                    type: string
+            type: object
+        media.TicketRequest:
+            properties:
+                checksum_sha256:
+                    type: string
+                content_type:
+                    type: string
+                size_bytes:
+                    format: int64
+                    type: integer
+            required:
+                - checksum_sha256
+                - content_type
+            type: object
+        media.TicketResponse:
+            properties:
+                expires_at:
+                    format: date-time
+                    type: string
+                headers:
+                    additionalProperties:
+                        type: string
+                    type: object
+                media_id:
+                    type: string
+                method:
+                    type: string
+                upload_url:
+                    type: string
+            type: object
+        metrics.Series:
+            properties:
+                count:
+                    format: int64
+                    type: integer
+                max_ms:
+                    type: number
+                route:
+                    type: string
+                status:
+                    format: int64
+                    type: integer
+                total_ms:
+                    type: number
+            type: object
+        weather.Day:
+            properties:
+                date:
+                    type: string
+                humidity_pct:
+                    format: int64
+                    type: integer
+                rain_mm:
+                    type: number
+                temp_max_c:
+                    type: number
+                temp_min_c:
+                    type: number
+                wind_kph:
+                    format: int64
+                    type: integer
+            type: object
+        weather.Forecast:
+            properties:
+                cell_key:
+                    type: string
+                data_age_seconds:
+                    format: int64
+                    type: integer
+                days:
+                    items:
+                        $ref: '#/components/schemas/weather.Day'
+                    type: array
+                fetched_at:
+                    format: date-time
+                    type: string
+                stale:
+                    type: boolean
+            type: object
+        weather.Outlook:
+            properties:
+                current_season:
+                    type: string
+                data_age_seconds:
+                    format: int64
+                    type: integer
+                rain_mm:
+                    additionalProperties:
+                        format: int64
+                        type: integer
+                    type: object
+                stale:
+                    type: boolean
+            type: object
+    securitySchemes:
+        bearer:
+            bearerFormat: JWT
+            scheme: bearer
+            type: http
+info:
+    description: Offline-first farming assistant API. Error `message` values are i18n dictionary keys.
+    title: AgriSmart API
+    version: 1.0.0
+openapi: 3.0.3
+paths:
+    /healthz:
+        get:
+            operationId: get_healthz
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/app.Health'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            summary: Liveness
+            tags:
+                - platform
+    /readyz:
+        get:
+            operationId: get_readyz
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/app.Health'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            summary: Readiness (database reachable)
+            tags:
+                - platform
+    /v1/admin/metrics:
+        get:
+            operationId: get_v1_admin_metrics
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/app.MetricsSnapshot'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Request metrics
+            tags:
+                - platform
+            x-permission: metrics:read
+    /v1/advisory/fields/{id}/crops/{code}:
+        get:
+            operationId: get_v1_advisory_fields_id_crops_code
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+                - in: path
+                  name: code
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: season
+                  required: false
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/advisory.CropDetail'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: One crop on a field
+            tags:
+                - advisory
+            x-permission: advisory:read
+    /v1/advisory/fields/{id}/crops/{code}/roi:
+        post:
+            operationId: post_v1_advisory_fields_id_crops_code_roi
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+                - in: path
+                  name: code
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/advisory.ROIRequest'
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/advisory.ROI'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: ROI with custom costs
+            tags:
+                - advisory
+            x-permission: advisory:read
+    /v1/advisory/fields/{id}/recommendations:
+        get:
+            operationId: get_v1_advisory_fields_id_recommendations
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: season
+                  required: false
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/advisory.Recommendations'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Ranked crops for a field
+            tags:
+                - advisory
+            x-permission: advisory:read
+    /v1/advisory/fields/{id}/rotation:
+        get:
+            operationId: get_v1_advisory_fields_id_rotation
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: start
+                  required: false
+                  schema:
+                    type: string
+                - in: query
+                  name: seasons
+                  required: false
+                  schema:
+                    format: int64
+                    type: integer
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/advisory.Rotation'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Nitrogen-balanced rotation plan
+            tags:
+                - advisory
+            x-permission: advisory:read
+    /v1/advisory/narrate:
+        post:
+            operationId: post_v1_advisory_narrate
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/advisory.NarrateRequest'
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/advisory.Narration'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Narrate a chart (text key + voice key)
+            tags:
+                - advisory
+            x-permission: advisory:read
+    /v1/alerts:
+        get:
+            operationId: get_v1_alerts
+            parameters:
+                - in: query
+                  name: unread
+                  required: false
+                  schema:
+                    type: boolean
+                - in: query
+                  name: limit
+                  required: false
+                  schema:
+                    format: int64
+                    type: integer
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/alert.Inbox'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Alert inbox
+            tags:
+                - alerts
+            x-permission: alert:read
+    /v1/alerts/{id}:
+        get:
+            operationId: get_v1_alerts_id
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/alert.Alert'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: One alert
+            tags:
+                - alerts
+            x-permission: alert:read
+    /v1/alerts/{id}/read:
+        post:
+            operationId: post_v1_alerts_id_read
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/alert.Alert'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Mark read
+            tags:
+                - alerts
+            x-permission: alert:read
+    /v1/alerts/read-all:
+        post:
+            operationId: post_v1_alerts_read_all
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/alert.ReadAll'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Mark all read
+            tags:
+                - alerts
+            x-permission: alert:read
+    /v1/alerts/subscription:
+        delete:
+            operationId: delete_v1_alerts_subscription
+            responses:
+                "204":
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Stop area alerts
+            tags:
+                - alerts
+            x-permission: subscription:write
+        get:
+            operationId: get_v1_alerts_subscription
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/alert.Subscription'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Alert subscription
+            tags:
+                - alerts
+            x-permission: alert:read
+        put:
+            operationId: put_v1_alerts_subscription
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/alert.SubscriptionRequest'
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/alert.Subscription'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Set alert location and kinds
+            tags:
+                - alerts
+            x-permission: subscription:write
+    /v1/assistant/ask:
+        post:
+            operationId: post_v1_assistant_ask
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/assistant.AskRequest'
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/assistant.AskResponse'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Ask the voice assistant (stub agent; answer is a dictionary key)
+            tags:
+                - assistant
+            x-permission: assistant:ask
+    /v1/auth/guest:
+        post:
+            operationId: post_v1_auth_guest
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/identity.Session'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            summary: Start a guest session
+            tags:
+                - auth
+    /v1/auth/logout:
+        post:
+            operationId: post_v1_auth_logout
+            responses:
+                "204":
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Revoke the current session
+            tags:
+                - auth
+            x-permission: profile:read
+    /v1/auth/otp/request:
+        post:
+            operationId: post_v1_auth_otp_request
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/identity.PhoneRequest'
+                required: true
+            responses:
+                "202":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/identity.OTPRequested'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            summary: Send a one-time code by SMS
+            tags:
+                - auth
+    /v1/auth/otp/verify:
+        post:
+            operationId: post_v1_auth_otp_verify
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/identity.VerifyRequest'
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/identity.Session'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            summary: Exchange a code for a session
+            tags:
+                - auth
+    /v1/auth/refresh:
+        post:
+            operationId: post_v1_auth_refresh
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/identity.RefreshRequest'
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/identity.Tokens'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            summary: Rotate a refresh token
+            tags:
+                - auth
+    /v1/crops:
+        get:
+            operationId: get_v1_crops
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/farm.CropList'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            summary: Crop catalogue
+            tags:
+                - farm
+    /v1/crops/{code}:
+        get:
+            operationId: get_v1_crops_code
+            parameters:
+                - in: path
+                  name: code
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/farm.Crop'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            summary: One crop
+            tags:
+                - farm
+    /v1/fields:
+        get:
+            operationId: get_v1_fields
+            parameters:
+                - in: query
+                  name: owner_id
+                  required: false
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/farm.FieldList'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: List fields
+            tags:
+                - farm
+            x-permission: field:read
+        post:
+            operationId: post_v1_fields
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/farm.FieldRequest'
+                required: true
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/farm.Field'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Create a field
+            tags:
+                - farm
+            x-permission: field:create
+    /v1/fields/{id}:
+        delete:
+            operationId: delete_v1_fields_id
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "204":
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Delete a field
+            tags:
+                - farm
+            x-permission: field:write
+        get:
+            operationId: get_v1_fields_id
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/farm.Field'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Get a field
+            tags:
+                - farm
+            x-permission: field:read
+        patch:
+            operationId: patch_v1_fields_id
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/farm.FieldPatchRequest'
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/farm.Field'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Update a field
+            tags:
+                - farm
+            x-permission: field:write
+    /v1/fields/{id}/plots:
+        post:
+            operationId: post_v1_fields_id_plots
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/farm.PlotRequest'
+                required: true
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/farm.Plot'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Add a plot
+            tags:
+                - farm
+            x-permission: field:write
+    /v1/fields/{id}/soil:
+        put:
+            operationId: put_v1_fields_id_soil
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/farm.Soil'
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/farm.Field'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Record a soil test
+            tags:
+                - farm
+            x-permission: field:write
+    /v1/i18n/{lang}:
+        get:
+            operationId: get_v1_i18n_lang
+            parameters:
+                - in: path
+                  name: lang
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: since
+                  required: false
+                  schema:
+                    format: int64
+                    type: integer
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/localization.Dictionary'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            summary: Dictionary snapshot or delta (ETag/304)
+            tags:
+                - i18n
+    /v1/i18n/{lang}/entries:
+        put:
+            operationId: put_v1_i18n_lang_entries
+            parameters:
+                - in: path
+                  name: lang
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/localization.UpsertEntriesRequest'
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/localization.UpsertResponse'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Upsert dictionary entries
+            tags:
+                - i18n
+            x-permission: dictionary:write
+    /v1/i18n/languages:
+        get:
+            operationId: get_v1_i18n_languages
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/localization.Languages'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            summary: Supported languages
+            tags:
+                - i18n
+    /v1/me:
+        get:
+            operationId: get_v1_me
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/identity.User'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Current profile
+            tags:
+                - profile
+            x-permission: profile:read
+        patch:
+            operationId: patch_v1_me
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/identity.UpdateMeRequest'
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/identity.User'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Update profile
+            tags:
+                - profile
+            x-permission: profile:write
+    /v1/media/{id}:
+        get:
+            operationId: get_v1_media_id
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/media.Object'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Media metadata and download link
+            tags:
+                - media
+            x-permission: media:read
+    /v1/media/{id}/complete:
+        post:
+            operationId: post_v1_media_id_complete
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/media.Object'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Verify an upload
+            tags:
+                - media
+            x-permission: media:upload
+    /v1/media/blob/{key}:
+        get:
+            operationId: get_v1_media_blob_key
+            parameters:
+                - in: path
+                  name: key
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            summary: Signed download (local backend)
+            tags:
+                - media
+        put:
+            operationId: put_v1_media_blob_key
+            parameters:
+                - in: path
+                  name: key
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            summary: Signed direct upload (local backend)
+            tags:
+                - media
+    /v1/media/tickets:
+        post:
+            operationId: post_v1_media_tickets
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/media.TicketRequest'
+                required: true
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/media.TicketResponse'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Request an upload ticket
+            tags:
+                - media
+            x-permission: media:upload
+    /v1/scans:
+        get:
+            operationId: get_v1_scans
+            parameters:
+                - in: query
+                  name: saved
+                  required: false
+                  schema:
+                    type: boolean
+                - in: query
+                  name: owner_id
+                  required: false
+                  schema:
+                    type: string
+                - in: query
+                  name: limit
+                  required: false
+                  schema:
+                    format: int64
+                    type: integer
+                - in: query
+                  name: before
+                  required: false
+                  schema:
+                    format: date-time
+                    type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/diagnosis.ScanList'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Scan history / saved log
+            tags:
+                - diagnosis
+            x-permission: scan:read
+        post:
+            operationId: post_v1_scans
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/diagnosis.CreateScanRequest'
+                required: true
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/diagnosis.Scan'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Diagnose an uploaded leaf photo (idempotent)
+            tags:
+                - diagnosis
+            x-permission: scan:create
+    /v1/scans/{id}:
+        get:
+            operationId: get_v1_scans_id
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/diagnosis.Scan'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: One scan
+            tags:
+                - diagnosis
+            x-permission: scan:read
+        patch:
+            operationId: patch_v1_scans_id
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/diagnosis.AnnotateRequest'
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/diagnosis.Scan'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Annotate (note, save to log)
+            tags:
+                - diagnosis
+            x-permission: scan:create
+    /v1/scans/{id}/retry:
+        post:
+            operationId: post_v1_scans_id_retry
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/diagnosis.Scan'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Retry a failed analysis
+            tags:
+                - diagnosis
+            x-permission: scan:create
+    /v1/scans/sync:
+        post:
+            operationId: post_v1_scans_sync
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/diagnosis.SyncRequest'
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/diagnosis.SyncResponse'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Apply an offline operation queue
+            tags:
+                - diagnosis
+            x-permission: scan:sync
+    /v1/voice/{lang}:
+        get:
+            operationId: get_v1_voice_lang
+            parameters:
+                - in: path
+                  name: lang
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: since
+                  required: false
+                  schema:
+                    format: int64
+                    type: integer
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/localization.VoiceManifest'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            summary: Voice clip manifest (ETag/304)
+            tags:
+                - i18n
+    /v1/voice/{lang}/assets:
+        put:
+            operationId: put_v1_voice_lang_assets
+            parameters:
+                - in: path
+                  name: lang
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/localization.UpsertVoiceRequest'
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/localization.UpsertResponse'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Register pre-recorded voice clips
+            tags:
+                - i18n
+            x-permission: voice:write
+    /v1/weather:
+        get:
+            operationId: get_v1_weather
+            parameters:
+                - in: query
+                  name: lat
+                  required: false
+                  schema:
+                    type: number
+                - in: query
+                  name: lng
+                  required: false
+                  schema:
+                    type: number
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/weather.Forecast'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: 7-day forecast with data age
+            tags:
+                - weather
+            x-permission: weather:read
+    /v1/weather/seasonal:
+        get:
+            operationId: get_v1_weather_seasonal
+            parameters:
+                - in: query
+                  name: lat
+                  required: false
+                  schema:
+                    type: number
+                - in: query
+                  name: lng
+                  required: false
+                  schema:
+                    type: number
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/weather.Outlook'
+                    description: success
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/httpx.ErrorBody'
+                    description: error
+            security:
+                - bearer: []
+            summary: Seasonal rainfall outlook
+            tags:
+                - weather
+            x-permission: weather:read

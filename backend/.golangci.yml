@@ -1,0 +1,48 @@
+version: "2"
+run:
+  build-tags: [integration]
+  tests: true
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - errcheck
+    - errorlint
+    - exhaustive
+    - gocritic
+    - gosec
+    - misspell
+    - noctx
+    - revive
+    - sqlclosecheck
+    - unconvert
+  settings:
+    exhaustive:
+      default-signifies-exhaustive: true
+    gosec:
+      excludes:
+        - G104 # covered by errcheck
+    revive:
+      rules:
+        - name: exported
+          disabled: true
+        - name: package-comments
+          disabled: true
+        - name: var-naming
+        - name: receiver-naming
+        - name: indent-error-flow
+        - name: error-strings
+        - name: error-return
+        - name: errorf
+        - name: unused-parameter
+          disabled: true
+  exclusions:
+    presets: [std-error-handling]
+    rules:
+      - path: _test\.go
+        text: ST1012
+        linters: [staticcheck]
+      - path: _test\.go
+        linters: [gosec, noctx, bodyclose, errcheck, gocritic, errorlint, sqlclosecheck]
+formatters:
+  enable: [gofmt, goimports]

@@ -1,25 +1,25 @@
 # BUILD STATE
 Updated: 2026-09-25
-Branch: claude/sleepy-mccarthy-h8hv7s
-PR: not yet opened
-Last commit: (none — build not started)
-CI: n/a
+Branch: claude/festive-maxwell-n5xdmi
+PR: #1 (draft)
+Last commit: phase 11
+CI: pending
 
 ## PHASES
 | # | Name | Status | Commit |
 |---|------|--------|--------|
-| 0 | Bootstrap & guardrails | todo | — |
-| 1 | Platform kernel | todo | — |
-| 2 | Persistence & migrations | todo | — |
-| 3 | Identity (auth + RBAC) | todo | — |
-| 4 | Localization (dictionary + voice) | todo | — |
-| 5 | Farm | todo | — |
-| 6 | Media | todo | — |
-| 7 | Diagnosis | todo | — |
-| 8 | Advisory | todo | — |
-| 9 | Weather & Alert | todo | — |
-| 10 | AI adapter (OPEN SLOT) | todo | — |
-| 11 | API assembly & deploy targets | todo | — |
+| 0 | Bootstrap & guardrails | done | 6b0ac80 |
+| 1 | Platform kernel | done | 04ec047 |
+| 2 | Persistence & migrations | done | cb5e536 |
+| 3 | Identity (auth + RBAC) | done | cbc3b7f |
+| 4 | Localization (dictionary + voice) | done | 901e9e0 |
+| 5 | Farm | done | 7f1c504 |
+| 6 | Media | done | d1a0b75 |
+| 7 | Diagnosis | done | 8704d16 |
+| 8 | Advisory | done | 361c350 |
+| 9 | Weather & Alert | done | ac99c43 |
+| 10 | AI adapter (OPEN SLOT) | done | de74f01 |
+| 11 | API assembly & deploy targets | done | (this) |
 | 12 | Flutter foundation | todo | — |
 | 13 | Flutter onboarding & auth | todo | — |
 | 14 | Flutter home & dashboard | todo | — |
@@ -29,11 +29,10 @@ CI: n/a
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Start Phase 0: scaffold the repo, Makefile, golangci config, CI workflow, coverage gate, docs
-skeleton, then open the PR.
+Phase 12: Flutter foundation — theme tokens, DI, go_router, Dio (auth interceptor, refresh-on-401, retry), secure storage, local store, offline queue, runtime i18n with RTL; goldens.
 
 ## BLOCKERS
 none
 
 ## DECISIONS THIS PHASE
-none yet
+- jsonb as text (exec-mode bug) + harness in prod pool mode; flush after every request; ReadFile config
