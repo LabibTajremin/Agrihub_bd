@@ -1,14 +1,14 @@
 # BUILD STATE
 Updated: 2026-09-25
-Branch: claude/sleepy-mccarthy-h8hv7s
-PR: not yet opened
-Last commit: (none — build not started)
-CI: n/a
+Branch: claude/festive-maxwell-n5xdmi
+PR: (opening)
+Last commit: phase 0
+CI: pending
 
 ## PHASES
 | # | Name | Status | Commit |
 |---|------|--------|--------|
-| 0 | Bootstrap & guardrails | todo | — |
+| 0 | Bootstrap & guardrails | done | (this) |
 | 1 | Platform kernel | todo | — |
 | 2 | Persistence & migrations | todo | — |
 | 3 | Identity (auth + RBAC) | todo | — |
@@ -29,11 +29,10 @@ CI: n/a
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Start Phase 0: scaffold the repo, Makefile, golangci config, CI workflow, coverage gate, docs
-skeleton, then open the PR.
+Phase 1: write backend/internal/platform/{config,logger,errs,validator,httpx,clock,idgen,cache,archtest}.
 
 ## BLOCKERS
 none
 
 ## DECISIONS THIS PHASE
-none yet
+- Branch is claude/festive-maxwell-n5xdmi (session-bound). See docs/DECISIONS.md.

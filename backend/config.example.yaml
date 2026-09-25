@@ -1,0 +1,4 @@
+# AgriSmart API configuration — every key is documented here (filled in by Phase 1).
+app:
+  # Deployment environment: development | test | production
+  env: development

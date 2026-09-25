@@ -1,0 +1,15 @@
+# Go
+backend/coverage.out
+backend/*.test
+backend/bin/
+backend/tmp/
+# Env / secrets
+.env
+*.env.local
+# Local storage used by the local-disk media adapter
+backend/var/
+# Editors
+.idea/
+.vscode/
+*.swp
+.DS_Store
