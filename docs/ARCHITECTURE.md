@@ -133,3 +133,17 @@ Swapping the in-process bus for NATS/Kafka at extraction time replaces the `Disp
   (flagging `nitrogen_deficit`).
 - Weather unavailable → climatological rainfall with `stale: true` (never an error).
 - Golden files pin recommendations and rotation for a fixed field (`advisory/testdata`).
+
+## Weather & alerts
+- **Circuit breaker** (`platform/breaker`): closed → open after N consecutive failures → half-open
+  after the timeout (≤ M probes) → closed on success / open on failure. The forecast provider (stub or
+  Open-Meteo HTTP) is always wrapped in it.
+- **Observation cache**: forecasts are cached per 0.1° cell. Served from cache while younger than
+  `stale_after/3`; refreshed otherwise. If the provider fails, the cached copy is returned with its
+  `data_age_seconds` and `stale: true` — stale data is flagged, never hidden. No cache and no
+  provider → `503 weather.unavailable`.
+- **Rules engine** (`alert/domain`, pure): heavy rain (≥ 50 mm warning, ≥ 100 critical), heat
+  (≥ 35 °C / ≥ 38 °C), blast risk (humidity ≥ 85% with 20–26 °C nights), disease follow-up after a
+  completed diagnosis. Consumers subscribe to `weather.forecast.updated` and
+  `diagnosis.scan.completed`; alerts are unique per (user, source event, kind), so redelivery is a
+  no-op. Push delivery is a `Notifier` port with a logging stub.

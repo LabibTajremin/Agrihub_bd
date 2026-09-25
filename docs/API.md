@@ -77,3 +77,18 @@ plans (steps are dictionary keys); below → `low_confidence` (client shows the 
 | GET | `/v1/advisory/fields/{id}/rotation?start=&seasons=` | same | nitrogen-balanced plan (1–6 seasons) |
 | POST | `/v1/advisory/narrate` | `advisory:read` | `{chart, lang, data}` → `{text_key, voice_key}` via the AI port |
 Seasons: `aman` (Jul–Oct), `boro` (Nov–Feb), `aus` (Mar–Jun); default = the current season.
+
+## Weather
+| Method | Path | Permission | Notes |
+|---|---|---|---|
+| GET | `/v1/weather?lat=&lng=` | `weather:read` | 7-day forecast on a 0.1° cell with `data_age_seconds` and `stale` |
+| GET | `/v1/weather/seasonal?lat=&lng=` | `weather:read` | seasonal rainfall outlook (climatology × this week's anomaly) |
+
+## Alerts
+| Method | Path | Permission | Notes |
+|---|---|---|---|
+| GET | `/v1/alerts?unread=&limit=` | `alert:read` | inbox + `unread_count` |
+| GET | `/v1/alerts/{id}` | `alert:read` | own alerts only |
+| POST | `/v1/alerts/{id}/read`, `/v1/alerts/read-all` | `alert:read` | |
+| GET/PUT/DELETE | `/v1/alerts/subscription` | `alert:read` / `subscription:write` | `{lat, lng, kinds[]}` kinds ∈ heavy_rain, heat, blast_risk, disease_followup |
+Alert titles and bodies are dictionary keys (`alerts.<kind>.title|body`) with `params`.

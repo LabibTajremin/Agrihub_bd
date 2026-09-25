@@ -94,3 +94,12 @@ One line per non-obvious choice: **decision** — rationale.
 - **Advisory owns no tables** — it is computation over farm, weather and AI ports.
 - **Rotation scores use each crop's first season's rainfall** — a crop appears once per plan layer; a
   per-layer score adds complexity without changing typical plans.
+
+## Phase 9
+- **Weather cache refreshes at `stale_after/3`** — one threshold in config drives both freshness and
+  the stale flag.
+- **Seasonal outlook = regional climatology scaled by this week's rainfall anomaly (±30%)** — the
+  forecast API has no seasonal product; the method is documented and deterministic.
+- **Alert consumers reference topics by name, never other modules' types** — each consumer decodes
+  its own payload struct, so extraction needs no shared code.
+- **Notifier failures are logged, not retried** — the alert is already stored and visible in the inbox.

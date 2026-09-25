@@ -361,6 +361,9 @@ func TestQueryHelpers(t *testing.T) {
 	if f, err := QueryFloat(r, "f", 0, 2); f != 1.5 || err != nil {
 		t.Fatal(f, err)
 	}
+	if _, err := QueryFloat(httptest.NewRequest("GET", "/?f=NaN", nil), "f", 0, 2); err == nil {
+		t.Fatal("NaN must be rejected")
+	}
 	if _, err := QueryFloat(r, "fbad", 0, 2); err == nil {
 		t.Fatal()
 	}

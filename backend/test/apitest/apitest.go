@@ -52,7 +52,7 @@ func New(t testing.TB, db *database.DB) *API {
 	k := kernel.Kernel{DB: db, Clock: c, IDs: ids, Validator: validator.New(), Logger: logger.Discard(),
 		Events: outbox.NewPublisher(db), Bus: bus}
 	signer := authn.NewSigner(authn.SignerOptions{Keys: map[string][]byte{"k1": []byte(JWTSecret)}, ActiveKID: "k1",
-		Issuer: "agrismart", TTL: 15 * time.Minute, Clock: c, IDs: ids})
+		Issuer: "agrismart", TTL: 24 * 365 * time.Hour, Clock: c, IDs: ids}) // long-lived so tests can advance the clock
 	h := authn.HTTP{Verifier: signer}
 	router := httpx.NewRouter(httpx.Options{
 		Logger: k.Logger, Clock: c, IDs: ids, Metrics: metrics.Nop{}, Limiter: ratelimit.NewMemory(c),

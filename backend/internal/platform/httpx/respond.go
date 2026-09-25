@@ -70,7 +70,7 @@ func QueryInt(r *http.Request, name string, def, lo, hi int64) (int64, error) {
 // QueryFloat parses a required float query parameter bounded to [lo, hi].
 func QueryFloat(r *http.Request, name string, lo, hi float64) (float64, error) {
 	f, err := strconv.ParseFloat(r.URL.Query().Get(name), 64)
-	if err != nil || f < lo || f > hi {
+	if err != nil || !(f >= lo && f <= hi) { // also rejects NaN
 		return 0, ErrBadParam.WithField(name, "number out of range")
 	}
 	return f, nil
