@@ -2,7 +2,7 @@
 Updated: 2026-09-25
 Branch: claude/festive-maxwell-n5xdmi
 PR: #1 (draft)
-Last commit: phase 4
+Last commit: phase 5
 CI: pending
 
 ## PHASES
@@ -12,8 +12,8 @@ CI: pending
 | 1 | Platform kernel | done | 04ec047 |
 | 2 | Persistence & migrations | done | cb5e536 |
 | 3 | Identity (auth + RBAC) | done | cbc3b7f |
-| 4 | Localization (dictionary + voice) | done | (this) |
-| 5 | Farm | todo | — |
+| 4 | Localization (dictionary + voice) | done | 901e9e0 |
+| 5 | Farm | done | (this) |
 | 6 | Media | todo | — |
 | 7 | Diagnosis | todo | — |
 | 8 | Advisory | todo | — |
@@ -29,10 +29,10 @@ CI: pending
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Phase 5: modules/farm (Field, Plot, SoilProfile, Crop catalogue, GPS value object, area units in mm², ownership CRUD).
+Phase 6: modules/media (storage port, local-disk + S3 (minio-go) adapters w/ shared contract suite, upload tickets, content-type/size/checksum, dHash).
 
 ## BLOCKERS
 none
 
 ## DECISIONS THIS PHASE
-- spec table names for i18n; empty voice manifest; 319-key seed; i18n-sync copies to mobile
+- area in 1e-9 m2 with 128-bit math; static crop catalogue; farm.FieldView/CropView published ports

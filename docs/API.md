@@ -31,3 +31,16 @@ generated from the route table and diff-tested (Phase 11).
 | GET | `/v1/voice/{lang}?since=` | public (ETag/304) |
 | PUT | `/v1/voice/{lang}/assets` | `voice:write` |
 See `docs/LOCALIZATION.md`.
+
+## Farm
+| Method | Path | Permission | Notes |
+|---|---|---|---|
+| GET | `/v1/crops`, `/v1/crops/{code}` | public | crop catalogue (names are i18n keys `crop.<code>.name`) |
+| GET | `/v1/fields?owner_id=` | `field:read` | own fields; another owner needs `field:read_any` |
+| POST | `/v1/fields` | `field:create` | `{name, area:{value_milli, unit}, location:{lat,lng}, district, irrigation, soil?}` |
+| GET/PATCH/DELETE | `/v1/fields/{id}` | `field:read` / `field:write` | ownership policy applies |
+| PUT | `/v1/fields/{id}/soil` | `field:write` | soil test |
+| POST | `/v1/fields/{id}/plots` | `field:write` | plots may not exceed the field area |
+
+Areas are sent as `value_milli` (thousandths of `unit` ∈ decimal, bigha, acre, hectare) and returned
+in every unit.

@@ -81,3 +81,14 @@ Swapping the in-process bus for NATS/Kafka at extraction time replaces the `Disp
 - **RBAC**: roles `guest ⊂ farmer ⊂ field_officer ⊂ agronomist ⊂ admin`; static matrix in
   `platform/authz` (golden file `testdata/matrix.golden`). Use cases call `authn.Require(ctx, perm)`;
   ownership rules use `authz.Owned(role, subject, owner, ownPerm, anyPerm)`.
+
+## Farm data
+- **Area** is stored as integer nano-square-metres (10⁻⁹ m²): 1 decimal = 40 468 564 224, 1 bigha
+  (Bangladesh standard, 33 decimals) = 1 335 462 619 392, 1 acre = 4 046 856 422 400,
+  1 hectare = 10¹³. Conversion uses 128-bit intermediates (`math/bits`), so it is exact and a
+  property test proves `Milli(FromMilli(x)) == x` for every unit.
+- **Coordinates** are integer degrees × 10⁷.
+- **Crop catalogue** is static reference data in `farm/domain/catalogue.go` (money in poisha,
+  fractions in basis points). Seasons: `aman → boro → aus → aman`.
+- Other modules read farm data only through `farm.Module.Field(ctx, id) FieldView` and
+  `farm.Module.Crops() []CropView`; the composition root adapts them to the consumer's own port.

@@ -92,3 +92,9 @@ func (t faultyTx) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 type errRow struct{ err error }
 
 func (r errRow) Scan(...any) error { return r.err }
+
+// FaultyOver wraps an existing harness DB (sharing its transaction, so data it
+// already holds stays visible) with fault injection.
+func FaultyOver(db *database.DB, fs ...Fault) *database.DB {
+	return database.New(Faulty(db.Root().(pgx.Tx), fs...))
+}

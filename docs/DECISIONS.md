@@ -63,3 +63,11 @@ One line per non-obvious choice: **decision** — rationale.
   the text and disables play until a clip exists (`common.audio_unavailable`).
 - **Seed dictionaries are authored once for the whole app (319 keys)** so later phases rarely touch
   seven files; new keys are added to all seven in the phase that needs them.
+
+## Phase 5
+- **Canonical area unit is 10⁻⁹ m²** — the smallest unit in which an acre (and so a decimal and a
+  bigha) is an exact integer; mm² is not.
+- **Bigha = 33 decimals** — the Bangladesh standard; regional bighas differ and are out of scope.
+- **Crop catalogue is code, not a table** — immutable reference data, versioned with the code.
+- **Updates and deletes are owner-or-admin (`field:write_any`)**; officers and agronomists can read
+  any field but not edit it.

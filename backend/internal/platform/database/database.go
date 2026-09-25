@@ -156,3 +156,6 @@ func Collect[T any](ctx context.Context, q Querier, scan func(pgx.CollectableRow
 	}
 	return pgx.CollectRows(rows, scan)
 }
+
+// Root returns the handle queries fall back to outside a transaction.
+func (d *DB) Root() Beginner { return d.root }

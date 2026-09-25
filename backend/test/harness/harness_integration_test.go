@@ -128,6 +128,10 @@ func TestFaulty(t *testing.T) {
 	if err := inner.QueryRow(ctx, "SELECT 5").Scan(&n); err != nil || n != 5 {
 		t.Fatal(err)
 	}
+	over := FaultyOver(DB(t), Fault{Op: "exec", Match: "SELECT 9", Err: boom})
+	if _, err := over.Q(ctx).Exec(ctx, "SELECT 9"); !errors.Is(err, boom) {
+		t.Fatal(err)
+	}
 	db := FaultyDB(t, Fault{Op: "begin", Err: boom})
 	if err := db.WithinTx(ctx, func(context.Context) error { return nil }); err == nil {
 		t.Fatal("begin fault")
