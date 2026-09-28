@@ -168,7 +168,6 @@ void main() {
   });
 
   testWidgets('async view shows a spinner while loading', (tester) async {
-    final kit = await kitFor(tester);
     await tester.pumpWidget(MaterialApp(
         home: AsyncView<int>(load: () => Future.delayed(const Duration(seconds: 1), () => 1), builder: (_, v, _) => Text('$v'))));
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
