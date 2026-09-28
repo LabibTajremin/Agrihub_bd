@@ -8,6 +8,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/fakes.dart';
 
 void main() {
+  test('system clock reports UTC', () {
+    // ignore: prefer_const_constructors — constructed at runtime so the constructor is covered
+    final clock = SystemClock();
+    expect(clock.now().isUtc, isTrue);
+  });
+
   test('clocks and ids', () {
     final c = FixedClock(epoch)..advance(const Duration(hours: 1));
     expect(c.now(), epoch.add(const Duration(hours: 1)));
