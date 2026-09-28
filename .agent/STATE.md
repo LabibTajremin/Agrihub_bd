@@ -1,9 +1,9 @@
 # BUILD STATE
 Updated: 2026-09-28
 Branch: claude/festive-maxwell-n5xdmi
-PR: #1 (draft)
+PR: #1 (ready for review)
 Last commit: phase 18
-CI: pending (backend verify, mobile verify, e2e green locally)
+CI: green on e3c16dc (go + govulncheck, flutter, e2e)
 
 ## PHASES
 | # | Name | Status | Commit |
@@ -26,7 +26,7 @@ CI: pending (backend verify, mobile verify, e2e green locally)
 | 15 | Flutter plant doctor | done | 3c15807 |
 | 16 | Flutter crop advisor + chart narration | done | d1f5a6b |
 | 17 | Flutter voice shell + settings | done | 10f6887 |
-| 18 | Hardening & handoff | done | (this) |
+| 18 | Hardening & handoff | done | 257d13f (+e3c16dc toolchain pin) |
 
 ## NEXT ACTION
 Build complete. Watch CI on the phase-18 head; PR #1 is ready for review (do not merge).
