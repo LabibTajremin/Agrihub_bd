@@ -94,4 +94,16 @@ class AuthRepository {
   }
 
   Future<bool> get signedIn async => await tokens.read() != null;
+
+  /// Ends the session: the server revokes it when reachable; locally the
+  /// tokens and cached profile are always dropped.
+  Future<void> signOut() async {
+    try {
+      await api.send('POST', '/v1/auth/logout');
+    } on ApiException {
+      // offline or already revoked — the local sign-out still happens
+    }
+    await tokens.clear();
+    await db.remove('profile');
+  }
 }

@@ -175,3 +175,14 @@ One line per non-obvious choice: **decision** — rationale.
   audioplayers and geolocator platform fakes. The audio position ticker is disabled (no progress UI).
 - **Money is poisha end to end**; the UI formats taka with the dictionary's `unit.taka` pattern.
 - **Creating a field also sets the home location** used by weather and the seasonal outlook.
+
+## Phase 17 — Flutter voice shell + settings
+- **Voice capture is a `VoiceInput` port (§14 open slot)**; the shipped `NoVoiceInput` captures
+  nothing, so tap-to-talk falls through to the help state and its suggested questions, which are
+  sent as transcripts to `/v1/assistant/ask` (the server's agent stub). No STT, no TTS.
+- **Answers play the pre-recorded clip of their answer key** through the same narration pipeline.
+- **Understood intents link to the matching module** (weather detail, Plant Doctor, Crop Advisor).
+- **Expert help copies the helpline number** — no dialer plugin; the number is shown and copied.
+- **Sign-out always completes locally** (tokens + cached profile dropped) even when the server
+  revoke call cannot be made.
+- **Language changes are pushed to the profile best-effort**; offline, the local choice stands.

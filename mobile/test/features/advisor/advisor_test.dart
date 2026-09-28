@@ -215,7 +215,7 @@ void main() {
 
   test('voice clips: cached by checksum, verified, offline-safe', () async {
     final kit = await TestKit.create();
-    final voice = kit.services.voice;
+    final voice = kit.services.clips;
     kit.stubVoice('bn', ['a.b']);
     final first = await voice.clip('bn', 'a.b');
     expect(first, isNotNull);
@@ -236,7 +236,7 @@ void main() {
 
   test('narration controller disposes its completion listener', () async {
     final kit = await TestKit.create();
-    final c = NarrationController(voice: kit.services.voice, out: PluginAudioOut(), language: () => 'en');
+    final c = NarrationController(voice: kit.services.clips, out: PluginAudioOut(), language: () => 'en');
     await c.stop();
     c.dispose();
   });

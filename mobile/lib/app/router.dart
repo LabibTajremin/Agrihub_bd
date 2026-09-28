@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/l10n/localization.dart';
-import '../core/theme/tokens.dart';
 import '../features/advisor/advice_screens.dart';
 import '../features/advisor/fields_screen.dart';
 import '../features/advisor/setup_screen.dart';
@@ -15,6 +12,8 @@ import '../features/home/dashboard_screen.dart';
 import '../features/home/scan_list_screen.dart';
 import '../features/home/weather_screen.dart';
 import '../features/onboarding/language_screen.dart';
+import '../features/settings/settings_screens.dart';
+import '../features/voice/voice_screen.dart';
 import '../features/onboarding/model_screen.dart';
 import '../features/onboarding/otp_screen.dart';
 import '../features/onboarding/permissions_screen.dart';
@@ -27,20 +26,6 @@ import 'shell.dart';
 
 /// Tab roots, in navigation-bar order.
 const tabPaths = ['/home', '/doctor', '/advisor', '/voice', '/settings'];
-
-/// Placeholder body until a feature phase provides the real screen.
-class ComingSoon extends StatelessWidget {
-  const ComingSoon({super.key, required this.titleKey});
-  final String titleKey;
-
-  @override
-  Widget build(BuildContext context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(Tokens.spaceXl),
-          child: Text(context.t(titleKey), style: Tokens.headline),
-        ),
-      );
-}
 
 /// Builds the app router. Feature phases add their routes here.
 GoRouter buildRouter({String initialLocation = '/'}) {
@@ -103,9 +88,13 @@ GoRouter buildRouter({String initialLocation = '/'}) {
                       ]),
                 ]),
           ]),
-          GoRoute(path: '/voice', builder: (_, _) => const ComingSoon(titleKey: 'voice.title')),
-          GoRoute(path: '/settings', builder: (_, _) => const ComingSoon(titleKey: 'settings.title'), routes: [
-            GoRoute(path: 'expert', builder: (_, _) => const ComingSoon(titleKey: 'settings.expert_help')),
+          GoRoute(path: '/voice', builder: (_, _) => const VoiceScreen()),
+          GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen(), routes: [
+            GoRoute(path: 'language', builder: (_, _) => const LanguageSettingsScreen()),
+            GoRoute(path: 'models', builder: (_, _) => const ModelsScreen()),
+            GoRoute(path: 'expert', builder: (_, _) => const ExpertScreen()),
+            GoRoute(path: 'profile', builder: (_, _) => const ProfileSettingsScreen()),
+            GoRoute(path: 'privacy', builder: (_, _) => const PrivacyScreen()),
           ]),
         ],
       ),

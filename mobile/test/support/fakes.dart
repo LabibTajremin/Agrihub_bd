@@ -8,6 +8,7 @@ import 'package:agrismart/core/clock.dart';
 import 'package:agrismart/core/l10n/localization.dart';
 import 'package:agrismart/core/models/offline_model.dart';
 import 'package:agrismart/features/doctor/diagnosis_engine.dart';
+import 'package:agrismart/features/voice/voice_controller.dart';
 import 'package:agrismart/core/network/api_client.dart';
 import 'package:agrismart/core/network/connectivity.dart';
 import 'package:agrismart/core/storage/local_db.dart';
@@ -215,6 +216,25 @@ class FakeGeolocator extends GeolocatorPlatform with MockPlatformInterfaceMixin 
       speedAccuracy: 0);
 }
 
+/// Voice input the test answers: complete [pending] with an utterance (or null).
+class ScriptedVoiceInput implements VoiceInput {
+  Completer<Utterance?> pending = Completer<Utterance?>();
+  int cancels = 0;
+  @override
+  Future<Utterance?> listen() {
+    pending = Completer<Utterance?>();
+    return pending.future;
+  }
+
+  @override
+  Future<void> cancel() async {
+    cancels++;
+    if (!pending.isCompleted) {
+      pending.complete(null);
+    }
+  }
+}
+
 /// Returns scripted diagnoses in order and counts calls.
 class ScriptedEngine implements DiagnosisEngine {
   ScriptedEngine(this.results);
@@ -256,7 +276,7 @@ class TestKit {
   final FakeGeolocator geo;
 
   static Future<TestKit> create(
-      {String lang = 'en', bool strict = true, ModelSource? modelSource, DiagnosisEngine? engine}) async {
+      {String lang = 'en', bool strict = true, ModelSource? modelSource, DiagnosisEngine? engine, VoiceInput? voiceInput}) async {
     ConnectivityPlatform.instance = FakeConnectivity();
     final camera = FakeCameraPlatform();
     CameraPlatform.instance = camera;
@@ -286,6 +306,7 @@ class TestKit {
       auth: AuthRepository(api: api, tokens: tokens, db: db),
       models: OfflineModelManager(db: db, source: modelSource ?? const StubModelSource()),
       engine: engine ?? const StubDiagnosisEngine(),
+      voiceInput: voiceInput ?? const NoVoiceInput(),
     );
     return TestKit._(services, server, tokens, clock, camera, audio, geo);
   }
@@ -396,6 +417,26 @@ class TestKit {
     for (final k in keys) {
       server.json('GET', 'http://cdn.test/$lang/$k.mp3', k);
     }
+  }
+
+  /// The server's keyword-matching assistant stub, reproduced.
+  void stubAssistant() {
+    server.on('POST', '/v1/assistant/ask', (req) {
+      final text = ((req.body! as Map)['transcript'] as String).toLowerCase();
+      const intents = {'weather': 'rain', 'disease': 'wrong', 'crop': 'plant'};
+      for (final MapEntry(key: intent, value: kw) in intents.entries) {
+        if (text.contains(kw)) {
+          return Reply(200, {
+            'understood': true,
+            'intent': intent,
+            'answer_key': 'voice.answer.$intent',
+            'params': <String, String>{},
+            'follow_ups': [for (final i in intents.keys) if (i != intent) 'voice.suggestion.$i'],
+          });
+        }
+      }
+      return const Reply(200, {'understood': false, 'intent': '', 'answer_key': 'voice.not_understood', 'params': null, 'follow_ups': null});
+    });
   }
 
   static Map<String, Object?> fieldJson(String id, String name) => {

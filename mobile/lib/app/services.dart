@@ -17,6 +17,7 @@ import '../features/doctor/diagnosis_engine.dart';
 import '../features/doctor/doctor_repository.dart';
 import '../features/home/home_repository.dart';
 import '../features/onboarding/auth_repository.dart';
+import '../features/voice/voice_controller.dart';
 import '../features/onboarding/onboarding_store.dart';
 
 /// The app's service container (manual constructor injection — no reflection,
@@ -38,6 +39,7 @@ class AppServices {
     this.engine = const StubDiagnosisEngine(),
     AudioOut? audio,
     this.location = const PluginLocation(),
+    this.voiceInput = const NoVoiceInput(),
   })  : audio = audio ?? PluginAudioOut(),
         onboarding = OnboardingStore(db);
 
@@ -58,11 +60,13 @@ class AppServices {
   final DiagnosisEngine engine;
   final AudioOut audio;
   final LocationGateway location;
+  final VoiceInput voiceInput;
   late final reader = CachedReader(api: api, db: db, clock: clock, connectivity: connectivity);
   late final home = HomeRepository(reader: reader, api: api, db: db);
   late final advisor = AdvisorRepository(reader: reader, api: api, home: home);
-  late final voice = VoiceRepository(reader: reader, api: api, db: db);
-  late final narration = NarrationController(voice: voice, out: audio, language: () => l10n.current.language.code);
+  late final voice = VoiceController(api: api, input: voiceInput, language: () => l10n.current.language.code);
+  late final clips = VoiceRepository(reader: reader, api: api, db: db);
+  late final narration = NarrationController(voice: clips, out: audio, language: () => l10n.current.language.code);
   late final doctor = DoctorRepository(
       db: db, api: api, sync: sync, ids: ids, clock: clock, engine: engine, language: () => l10n.current.language.code);
 }
