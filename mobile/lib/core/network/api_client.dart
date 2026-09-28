@@ -144,6 +144,19 @@ class ApiClient {
 
   Future<Map<String, Object?>> post(String path, [Object? body]) async => (await send('POST', path, body: body)).json;
 
+  /// Sends raw bytes to a signed upload URL. No bearer token: the URL is the
+  /// credential (and object stores reject foreign auth headers).
+  Future<void> upload(String method, String url, List<int> bytes, Map<String, String> headers) async {
+    try {
+      await _bare.request<Object?>(url, data: Stream.value(bytes), options: Options(method: method, headers: {
+        ...headers,
+        Headers.contentLengthHeader: bytes.length,
+      }));
+    } on DioException catch (e) {
+      throw _map(e);
+    }
+  }
+
   static ApiException _map(DioException e) {
     final r = e.response;
     if (r == null) {

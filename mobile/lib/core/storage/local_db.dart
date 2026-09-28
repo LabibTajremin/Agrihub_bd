@@ -7,6 +7,7 @@ import 'package:drift/drift.dart';
 /// Tables:
 /// * `kv`       — small JSON documents (settings, dictionaries, caches)
 /// * `sync_ops` — the append-only offline operation queue (§6.7)
+/// * `blobs`    — binary payloads (captured leaf photos awaiting upload)
 class LocalDb extends GeneratedDatabase {
   LocalDb(super.executor);
 
@@ -14,7 +15,7 @@ class LocalDb extends GeneratedDatabase {
   Iterable<TableInfo<Table, dynamic>> get allTables => const [];
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -24,8 +25,28 @@ class LocalDb extends GeneratedDatabase {
               'seq INTEGER PRIMARY KEY AUTOINCREMENT, idempotency_key TEXT NOT NULL UNIQUE, '
               'kind TEXT NOT NULL, payload TEXT NOT NULL, created_at TEXT NOT NULL, '
               "status TEXT NOT NULL DEFAULT 'pending', error_code TEXT NOT NULL DEFAULT '')");
+          await _createBlobs();
+        },
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await _createBlobs();
+          }
         },
       );
+
+  Future<void> _createBlobs() => customStatement('CREATE TABLE blobs (k TEXT PRIMARY KEY, v BLOB NOT NULL)');
+
+  /// Stores binary data under [key].
+  Future<void> putBlob(String key, Uint8List data) => customStatement(
+      'INSERT INTO blobs (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v', [key, data]);
+
+  /// Reads binary data, or null.
+  Future<Uint8List?> blob(String key) async {
+    final rows = await customSelect('SELECT v FROM blobs WHERE k = ?', variables: [Variable(key)]).get();
+    return rows.isEmpty ? null : rows.single.read<Uint8List>('v');
+  }
+
+  Future<void> removeBlob(String key) => customStatement('DELETE FROM blobs WHERE k = ?', [key]);
 
   /// Reads a JSON document.
   Future<Object?> read(String key) async {

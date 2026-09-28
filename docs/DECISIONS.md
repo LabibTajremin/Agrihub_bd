@@ -152,3 +152,14 @@ One line per non-obvious choice: **decision** — rationale.
   renders empty rather than blanking the page.
 - **Home location defaults to Bangladesh's centre** until a field is pinned (phase 16).
 - **Dates are formatted with `MaterialLocalizations`** — localized without adding `intl`.
+
+## Phase 15 — Flutter Plant Doctor
+- **Diagnosis runs on the phone first** (`DiagnosisEngine` port, `StubDiagnosisEngine` — §14 open
+  slot). The result is shown immediately, online or not; the photo and scan are stored locally.
+- **Upload happens at sync time**: ticket → signed PUT (no bearer header) → complete → queue
+  `create_scan` → flush. Saves made offline follow as `annotate_scan` once the server id is known.
+- **Client dHash cache** (64-bit, Hamming ≤ 4, same crop, newest 50) skips the model for repeat photos.
+- **Photos live in a `blobs` table** (local schema v2, upgraded in place) — no file-path bookkeeping.
+- **Camera behind `CameraGateway`**; the plugin adapter is tested through a `CameraPlatform` fake.
+- **No gallery picker** — it would add a plugin; the camera is the product path.
+- **Sync is manual ("Sync now") in this phase**; automatic sync on reconnect is deferred to hardening.

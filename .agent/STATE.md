@@ -2,8 +2,8 @@
 Updated: 2026-09-28
 Branch: claude/festive-maxwell-n5xdmi
 PR: #1 (draft)
-Last commit: phase 14
-CI: phase 12 green; 13/14 pending
+Last commit: phase 15
+CI: phase 12 green; 13–15 pending
 
 ## PHASES
 | # | Name | Status | Commit |
@@ -22,17 +22,17 @@ CI: phase 12 green; 13/14 pending
 | 11 | API assembly & deploy targets | done | 6ce7757 |
 | 12 | Flutter foundation | done | d222468 |
 | 13 | Flutter onboarding & auth | done | 9c3f2f0 |
-| 14 | Flutter home & dashboard | done | (this) |
-| 15 | Flutter plant doctor | todo | — |
+| 14 | Flutter home & dashboard | done | 4056a79 (+34bcd73 lint fix) |
+| 15 | Flutter plant doctor | done | (this) |
 | 16 | Flutter crop advisor + chart narration | todo | — |
 | 17 | Flutter voice shell + settings | todo | — |
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Phase 15: mobile features/doctor (camera viewfinder via CameraPlatform fake, preview/retake, analysing, result w/ confidence meter + chemical/organic tabs, low-confidence, healthy, sync queue screen; on-device stub DiagnosisEngine; dHash cache); offline full-scan test.
+Phase 16: mobile features/advisor (fields list/empty, setup, GPS pin via GeolocatorPlatform fake, seasonal forecast, recommendations, crop detail, ROI, rotation) + NarrationControl on every chart (audioplayers fake, pre-recorded clip only).
 
 ## BLOCKERS
 none (after a container restart run `dockerd &` for integration tests)
 
 ## DECISIONS THIS PHASE
-- CachedReader offline-first GETs with data age; independent dashboard sections
+- on-device first diagnosis; upload at sync; blobs table (schema v2); manual sync (auto → phase 18)

@@ -6,11 +6,15 @@ import '../storage/local_db.dart';
 
 /// Result of one flush.
 class SyncReport {
-  const SyncReport({required this.applied, required this.rejected, required this.remaining, required this.offline});
+  const SyncReport(
+      {required this.applied, required this.rejected, required this.remaining, required this.offline, this.scanIds = const {}});
   final int applied;
   final int rejected;
   final int remaining;
   final bool offline;
+
+  /// Server scan ids by idempotency key, for applied operations.
+  final Map<String, String> scanIds;
 }
 
 /// The client half of offline sync (§6.7): an append-only queue with a
@@ -55,6 +59,7 @@ class SyncQueue extends ChangeNotifier {
     try {
       final res = await api.post('/v1/scans/sync', body);
       var applied = 0, rejected = 0;
+      final scanIds = <String, String>{};
       for (final r in (res['results']! as List).cast<Map>()) {
         final key = r['idempotency_key']! as String;
         if (r['outcome'] == 'rejected') {
@@ -62,11 +67,14 @@ class SyncQueue extends ChangeNotifier {
           await db.reject(key, '${r['error_code']}');
         } else {
           applied++;
+          if (r['scan_id'] case final String id) {
+            scanIds[key] = id;
+          }
           await db.dequeue(key);
         }
       }
       await refresh();
-      return SyncReport(applied: applied, rejected: rejected, remaining: _pending, offline: false);
+      return SyncReport(applied: applied, rejected: rejected, remaining: _pending, offline: false, scanIds: scanIds);
     } on ApiException catch (e) {
       return SyncReport(applied: 0, rejected: 0, remaining: ops.length, offline: e.isOffline);
     }

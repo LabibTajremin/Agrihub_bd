@@ -3,6 +3,10 @@ import 'package:go_router/go_router.dart';
 
 import '../core/l10n/localization.dart';
 import '../core/theme/tokens.dart';
+import '../features/doctor/camera_screen.dart';
+import '../features/doctor/preview_screen.dart';
+import '../features/doctor/result_screen.dart';
+import '../features/doctor/sync_screen.dart';
 import '../features/home/alerts_screen.dart';
 import '../features/home/dashboard_screen.dart';
 import '../features/home/scan_list_screen.dart';
@@ -15,6 +19,7 @@ import '../features/onboarding/phone_screen.dart';
 import '../features/onboarding/profile_screen.dart';
 import '../features/onboarding/slides_screen.dart';
 import '../features/onboarding/splash_screen.dart';
+import 'services.dart';
 import 'shell.dart';
 
 /// Tab roots, in navigation-bar order.
@@ -63,10 +68,23 @@ GoRouter buildRouter({String initialLocation = '/'}) {
             GoRoute(path: 'history', builder: (_, _) => const ScanListScreen(saved: false)),
             GoRoute(path: 'saved', builder: (_, _) => const ScanListScreen(saved: true)),
           ]),
-          GoRoute(path: '/doctor', builder: (_, _) => const ComingSoon(titleKey: 'diagnosis.camera.title')),
+          GoRoute(path: '/doctor', builder: (_, _) => const CameraScreen(), routes: [
+            GoRoute(
+                path: 'preview',
+                redirect: (context, _) => AppScope.of(context).doctor.photo == null ? '/doctor' : null,
+                builder: (_, _) => const PreviewScreen()),
+            GoRoute(
+                path: 'analysing',
+                redirect: (context, _) => AppScope.of(context).doctor.photo == null ? '/doctor' : null,
+                builder: (_, _) => const AnalysingScreen()),
+            GoRoute(path: 'result/:id', builder: (_, state) => ResultScreen(id: state.pathParameters['id']!)),
+            GoRoute(path: 'sync', builder: (_, _) => const SyncScreen()),
+          ]),
           GoRoute(path: '/advisor', builder: (_, _) => const ComingSoon(titleKey: 'advisor.fields.title')),
           GoRoute(path: '/voice', builder: (_, _) => const ComingSoon(titleKey: 'voice.title')),
-          GoRoute(path: '/settings', builder: (_, _) => const ComingSoon(titleKey: 'settings.title')),
+          GoRoute(path: '/settings', builder: (_, _) => const ComingSoon(titleKey: 'settings.title'), routes: [
+            GoRoute(path: 'expert', builder: (_, _) => const ComingSoon(titleKey: 'settings.expert_help')),
+          ]),
         ],
       ),
     ],
