@@ -144,3 +144,11 @@ One line per non-obvious choice: **decision** — rationale.
   (`test/features/onboarding/first_run_flow_test.dart`) and on a device (`integration_test/`).
 - **Unknown server error keys fall back to `errors.internal`** (`context.tError`), so a newer server
   never crashes an older app in strict mode.
+
+## Phase 14 — Flutter home & dashboard
+- **`CachedReader` for offline-first reads** — every GET is remembered in the local store; offline,
+  the copy is served with its age (server-reported age + time since fetch) and the banner shows it.
+- **Dashboard sections load independently** — a failed or forbidden section (e.g. a guest's inbox)
+  renders empty rather than blanking the page.
+- **Home location defaults to Bangladesh's centre** until a field is pinned (phase 16).
+- **Dates are formatted with `MaterialLocalizations`** — localized without adding `intl`.

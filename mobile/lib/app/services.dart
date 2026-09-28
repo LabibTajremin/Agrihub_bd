@@ -4,10 +4,12 @@ import '../core/clock.dart';
 import '../core/l10n/localization.dart';
 import '../core/models/offline_model.dart';
 import '../core/network/api_client.dart';
+import '../core/network/cached.dart';
 import '../core/network/connectivity.dart';
 import '../core/storage/local_db.dart';
 import '../core/storage/token_store.dart';
 import '../core/sync/sync_queue.dart';
+import '../features/home/home_repository.dart';
 import '../features/onboarding/auth_repository.dart';
 import '../features/onboarding/onboarding_store.dart';
 
@@ -39,6 +41,8 @@ class AppServices {
   final AuthRepository auth;
   final OfflineModelManager models;
   final OnboardingStore onboarding;
+  late final reader = CachedReader(api: api, db: db, clock: clock, connectivity: connectivity);
+  late final home = HomeRepository(reader: reader, api: api, db: db);
 }
 
 /// Exposes [AppServices] to the widget tree.

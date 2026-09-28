@@ -145,6 +145,11 @@ extension Translate on BuildContext {
   /// `context.t('home.quickscan.title')`
   String t(String key, [Map<String, Object?> params = const {}]) => L10nScope.of(this).t(key, params);
 
+  /// Translates [key] when the dictionary has it, else returns [fallback]
+  /// (for keys built from server data, e.g. `crop.<code>.name`).
+  String tOr(String key, String fallback, [Map<String, Object?> params = const {}]) =>
+      L10nScope.of(this).current.has(key) ? t(key, params) : fallback;
+
   /// Translates an API failure; unknown server keys fall back to a generic message.
   String tError(ApiException e) {
     final l10n = L10nScope.of(this);

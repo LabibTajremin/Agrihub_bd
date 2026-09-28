@@ -153,6 +153,69 @@ class TestKit {
     server.on('PATCH', '/v1/me', (req) => Reply(200, {...user(role), ...(req.body! as Map).cast<String, Object?>()}));
   }
 
+  /// Installs weather, alert and scan endpoints with realistic payloads.
+  void stubHome({bool stale = false, int unread = 1, List<Map<String, Object?>>? scans}) {
+    server.json('GET', '/v1/weather', {
+      'cell_key': 'c',
+      'fetched_at': '2026-03-01T05:50:00Z',
+      'data_age_seconds': 600,
+      'stale': stale,
+      'days': [
+        for (var i = 0; i < 7; i++)
+          {'date': '2026-03-0${i + 1}', 'temp_min_c': 18.4, 'temp_max_c': 29.6, 'rain_mm': 12.0 + i, 'humidity_pct': 70, 'wind_kph': 11},
+      ],
+    });
+    final alerts = [
+      alertJson('a1', 'heavy_rain', 'warning', {'mm': '60'}, read: unread == 0),
+      alertJson('a2', 'disease_followup', 'info', {'disease': 'disease.brown_spot.name'}, read: true),
+      alertJson('a3', 'heat', 'critical', {'temp': '38'}, read: true),
+    ];
+    server.json('GET', '/v1/alerts', {'alerts': alerts, 'unread_count': unread});
+    for (final a in alerts) {
+      server.json('GET', '/v1/alerts/${a['id']}', a);
+      server.json('POST', '/v1/alerts/${a['id']}/read', a);
+    }
+    server.json('POST', '/v1/alerts/read-all', {'updated': unread});
+    final all = scans ??
+        [
+          scanJson('s1', 'rice', saved: true, disease: 'disease.brown_spot.name'),
+          scanJson('s2', 'potato'),
+          scanJson('s3', 'tomato', status: 'failed'),
+          scanJson('s4', 'jute'),
+        ];
+    server.on('GET', '/v1/scans', (req) => Reply(200, {
+          'scans': req.query['saved'] == true ? all.where((s) => s['saved'] == true).toList() : all,
+        }));
+  }
+
+  static Map<String, Object?> alertJson(String id, String kind, String severity, Map<String, String> params,
+          {bool read = false}) =>
+      {
+        'id': id,
+        'kind': kind,
+        'severity': severity,
+        'title_key': 'alerts.$kind.title',
+        'body_key': 'alerts.$kind.body',
+        'params': params,
+        'created_at': '2026-03-01T05:00:00Z',
+        if (read) 'read_at': '2026-03-01T05:30:00Z',
+      };
+
+  static Map<String, Object?> scanJson(String id, String crop,
+          {bool saved = false, String status = 'completed', String? disease}) =>
+      {
+        'id': id,
+        'media_id': 'm-$id',
+        'crop_code': crop,
+        'status': status,
+        'captured_at': '2026-02-28T09:00:00Z',
+        'created_at': '2026-02-28T09:00:00Z',
+        'updated_at': '2026-02-28T09:00:00Z',
+        'note': '',
+        'saved': saved,
+        if (disease != null) 'diagnosis': {'name_key': disease},
+      };
+
   static Map<String, Object?> user(String role) =>
       {'id': '00000000-0000-7000-8000-0000000000a1', 'name': '', 'district': '', 'language': 'en', 'role': role};
 

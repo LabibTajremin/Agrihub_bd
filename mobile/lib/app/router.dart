@@ -3,6 +3,10 @@ import 'package:go_router/go_router.dart';
 
 import '../core/l10n/localization.dart';
 import '../core/theme/tokens.dart';
+import '../features/home/alerts_screen.dart';
+import '../features/home/dashboard_screen.dart';
+import '../features/home/scan_list_screen.dart';
+import '../features/home/weather_screen.dart';
 import '../features/onboarding/language_screen.dart';
 import '../features/onboarding/model_screen.dart';
 import '../features/onboarding/otp_screen.dart';
@@ -51,7 +55,14 @@ GoRouter buildRouter({String initialLocation = '/'}) {
           return Shell(index: i, onSelect: (n) => context.go(tabPaths[n]), child: child);
         },
         routes: [
-          GoRoute(path: '/home', builder: (_, _) => const ComingSoon(titleKey: 'home.quickscan.title')),
+          GoRoute(path: '/home', builder: (_, _) => const DashboardScreen(), routes: [
+            GoRoute(path: 'weather', builder: (_, _) => const WeatherScreen()),
+            GoRoute(path: 'alerts', builder: (_, _) => const AlertsScreen(), routes: [
+              GoRoute(path: ':id', builder: (_, state) => AlertDetailScreen(id: state.pathParameters['id']!)),
+            ]),
+            GoRoute(path: 'history', builder: (_, _) => const ScanListScreen(saved: false)),
+            GoRoute(path: 'saved', builder: (_, _) => const ScanListScreen(saved: true)),
+          ]),
           GoRoute(path: '/doctor', builder: (_, _) => const ComingSoon(titleKey: 'diagnosis.camera.title')),
           GoRoute(path: '/advisor', builder: (_, _) => const ComingSoon(titleKey: 'advisor.fields.title')),
           GoRoute(path: '/voice', builder: (_, _) => const ComingSoon(titleKey: 'voice.title')),
