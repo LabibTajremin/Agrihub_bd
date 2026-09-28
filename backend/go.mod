@@ -2,6 +2,8 @@ module github.com/labibtajremin/agrihub_bd/backend
 
 go 1.26.0
 
+toolchain go1.26.8
+
 require (
 	github.com/alicebob/miniredis/v2 v2.39.0
 	github.com/go-playground/validator/v10 v10.30.5

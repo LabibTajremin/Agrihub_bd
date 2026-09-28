@@ -195,4 +195,5 @@ One line per non-obvious choice: **decision** — rationale.
   assistant — numbers in `docs/TESTING.md`.
 - **`AutoSync`** flushes the offline queue when connectivity returns (deferred from phase 15).
 - **Client confidence threshold = 0.60**, the server's `ai.min_diagnosis_confidence` default.
-- **govulncheck** (pinned v1.8.0) in CI; `moby/go-archive` bumped to v0.3.0 (test-only chain).
+- **govulncheck** (pinned v1.8.0) in CI; `moby/go-archive` bumped to v0.3.0 (test-only chain);
+  `toolchain go1.26.8` in go.mod so CI builds with the patched standard library, not 1.26.0.
