@@ -11,7 +11,7 @@ Live progress is tracked in **`.agent/STATE.md`** — read it first in any build
 ## Quick facts
 - Backend: Go, API-only, clean architecture, repository pattern, modular monolith (microservice-ready)
 - Frontend: Flutter, mobile-first
-- Branch: `claude/sleepy-mccarthy-h8hv7s` · one commit per phase · one PR, merged by the user
+- Branch: `claude/festive-maxwell-n5xdmi` · one commit per phase · one PR, merged by the user
 - Coverage gate: 100% unit + integration, backend and mobile
 - The AI/ML model is an **open slot** — interfaces and a stub only, never implemented
 - Design reference: Figma `AgriSmart — Farmer App (User App) UI Kit & Flows` (58 screens, 25 components)

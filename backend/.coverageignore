@@ -1,0 +1,7 @@
+# Permitted coverage exclusions (BUILD_INSTRUCTION §8.2). Asserted by
+# internal/tools/covgate TestCoverageIgnore_IsExactlyThePermittedSet.
+cmd/*/main.go
+api/index.go
+**/*_gen.go
+**/*.pb.go
+**/mocks/**

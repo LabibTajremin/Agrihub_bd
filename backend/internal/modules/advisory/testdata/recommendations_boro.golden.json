@@ -1,0 +1,95 @@
+{
+  "season": "boro",
+  "outlook": {
+    "rain_mm": 120,
+    "data_age_seconds": 3600,
+    "stale": false
+  },
+  "items": [
+    {
+      "crop_code": "lentil",
+      "name_key": "crop.lentil.name",
+      "score": 89.5,
+      "criteria": {
+        "soil": 1,
+        "water": 0.98,
+        "pest": 0.8,
+        "market": 0.8,
+        "seed": 0.7
+      },
+      "yield_kg": {
+        "low": 900,
+        "likely": 1300,
+        "high": 1700
+      }
+    },
+    {
+      "crop_code": "mustard",
+      "name_key": "crop.mustard.name",
+      "score": 86.75,
+      "criteria": {
+        "soil": 1,
+        "water": 0.9,
+        "pest": 0.75,
+        "market": 0.75,
+        "seed": 0.8
+      },
+      "yield_kg": {
+        "low": 1000,
+        "likely": 1400,
+        "high": 1800
+      }
+    },
+    {
+      "crop_code": "wheat",
+      "name_key": "crop.wheat.name",
+      "score": 83.57,
+      "criteria": {
+        "soil": 1,
+        "water": 0.8428571428571429,
+        "pest": 0.7,
+        "market": 0.7,
+        "seed": 0.8
+      },
+      "yield_kg": {
+        "low": 2500,
+        "likely": 3500,
+        "high": 4200
+      }
+    },
+    {
+      "crop_code": "maize",
+      "name_key": "crop.maize.name",
+      "score": 83.5,
+      "criteria": {
+        "soil": 1,
+        "water": 0.74,
+        "pest": 0.7,
+        "market": 0.8,
+        "seed": 0.85
+      },
+      "yield_kg": {
+        "low": 6000,
+        "likely": 8000,
+        "high": 10000
+      }
+    },
+    {
+      "crop_code": "onion",
+      "name_key": "crop.onion.name",
+      "score": 82.25,
+      "criteria": {
+        "soil": 1,
+        "water": 0.8,
+        "pest": 0.55,
+        "market": 0.9,
+        "seed": 0.6
+      },
+      "yield_kg": {
+        "low": 10000,
+        "likely": 14000,
+        "high": 18000
+      }
+    }
+  ]
+}

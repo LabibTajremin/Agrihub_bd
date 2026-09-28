@@ -1,0 +1,29 @@
+{
+  "steps": [
+    {
+      "season": "boro",
+      "crop_code": "lentil",
+      "name_key": "crop.lentil.name",
+      "nitrogen_before_kg_ha": 120,
+      "nitrogen_after_kg_ha": 160,
+      "score": 89.5
+    },
+    {
+      "season": "aus",
+      "crop_code": "jute",
+      "name_key": "crop.jute.name",
+      "nitrogen_before_kg_ha": 160,
+      "nitrogen_after_kg_ha": 120,
+      "score": 85.75
+    },
+    {
+      "season": "aman",
+      "crop_code": "rice_aman",
+      "name_key": "crop.rice_aman.name",
+      "nitrogen_before_kg_ha": 120,
+      "nitrogen_after_kg_ha": 30,
+      "score": 71
+    }
+  ],
+  "nitrogen_deficit": false
+}
