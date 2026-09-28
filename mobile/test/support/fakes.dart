@@ -6,11 +6,13 @@ import 'package:agrismart/app/router.dart';
 import 'package:agrismart/app/services.dart';
 import 'package:agrismart/core/clock.dart';
 import 'package:agrismart/core/l10n/localization.dart';
+import 'package:agrismart/core/models/offline_model.dart';
 import 'package:agrismart/core/network/api_client.dart';
 import 'package:agrismart/core/network/connectivity.dart';
 import 'package:agrismart/core/storage/local_db.dart';
 import 'package:agrismart/core/storage/token_store.dart';
 import 'package:agrismart/core/sync/sync_queue.dart';
+import 'package:agrismart/features/onboarding/auth_repository.dart';
 import 'package:connectivity_plus_platform_interface/connectivity_plus_platform_interface.dart';
 import 'package:dio/dio.dart';
 import 'package:drift/native.dart';
@@ -89,6 +91,15 @@ class FakeConnectivity extends ConnectivityPlatform with MockPlatformInterfaceMi
 
 final epoch = DateTime.utc(2026, 3, 1, 6);
 
+/// A model source the test drives step by step.
+class ControlledModelSource implements ModelSource {
+  final controller = StreamController<double>();
+  @override
+  ModelManifest get manifest => const StubModelSource().manifest;
+  @override
+  Stream<double> fetch() => controller.stream;
+}
+
 /// Everything a test needs, built from fakes.
 class TestKit {
   TestKit._(this.services, this.server, this.tokens, this.clock);
@@ -97,7 +108,7 @@ class TestKit {
   final MemoryTokenStore tokens;
   final FixedClock clock;
 
-  static Future<TestKit> create({String lang = 'en', bool strict = true}) async {
+  static Future<TestKit> create({String lang = 'en', bool strict = true, ModelSource? modelSource}) async {
     ConnectivityPlatform.instance = FakeConnectivity();
     final server = FakeServer();
     final tokens = MemoryTokenStore();
@@ -117,12 +128,40 @@ class TestKit {
       connectivity: ConnectivityService(),
       l10n: l10n,
       sync: SyncQueue(db: db, api: api, ids: ids, clock: clock),
+      auth: AuthRepository(api: api, tokens: tokens, db: db),
+      models: OfflineModelManager(db: db, source: modelSource ?? const StubModelSource()),
     );
     return TestKit._(services, server, tokens, clock);
   }
 
   Future<void> signIn({String role = 'farmer'}) =>
       tokens.write(Tokens(access: 'access-1', refresh: 'refresh-1', role: role, userId: '00000000-0000-7000-8000-0000000000a1'));
+
+  /// Marks first-run onboarding finished so launches land on the app.
+  Future<void> onboarded() => services.onboarding.complete();
+
+  /// Installs the server's auth endpoints (verify accepts [code]).
+  void stubAuth({String code = '123456', String role = 'farmer'}) {
+    server.json('POST', '/v1/auth/otp/request', {'expires_at': '2026-03-01T06:05:00Z'}, 202);
+    server.on('POST', '/v1/auth/otp/verify', (req) {
+      final body = (req.body! as Map).cast<String, Object?>();
+      return body['code'] == code
+          ? Reply(200, session(role))
+          : const Reply(400, {'error': {'code': 'auth.otp_invalid', 'message': 'errors.auth.otp_invalid'}});
+    });
+    server.json('POST', '/v1/auth/guest', session('guest'), 201);
+    server.on('PATCH', '/v1/me', (req) => Reply(200, {...user(role), ...(req.body! as Map).cast<String, Object?>()}));
+  }
+
+  static Map<String, Object?> user(String role) =>
+      {'id': '00000000-0000-7000-8000-0000000000a1', 'name': '', 'district': '', 'language': 'en', 'role': role};
+
+  static Map<String, Object?> session(String role) => {
+        'token_type': 'Bearer',
+        'access_token': 'access-$role',
+        'refresh_token': 'refresh-$role',
+        'user': user(role),
+      };
 
   Future<void> pump(WidgetTester tester, {String location = '/home', GoRouter? router}) async {
     await tester.pumpWidget(AgriSmartApp(services: services, router: router ?? buildRouter(initialLocation: location)));

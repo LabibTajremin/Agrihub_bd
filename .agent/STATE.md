@@ -2,8 +2,8 @@
 Updated: 2026-09-28
 Branch: claude/festive-maxwell-n5xdmi
 PR: #1 (draft)
-Last commit: phase 12
-CI: pending
+Last commit: phase 13
+CI: phase 12 green; phase 13 pending
 
 ## PHASES
 | # | Name | Status | Commit |
@@ -20,8 +20,8 @@ CI: pending
 | 9 | Weather & Alert | done | ac99c43 |
 | 10 | AI adapter (OPEN SLOT) | done | de74f01 |
 | 11 | API assembly & deploy targets | done | 6ce7757 |
-| 12 | Flutter foundation | done | (this) |
-| 13 | Flutter onboarding & auth | todo | — |
+| 12 | Flutter foundation | done | d222468 |
+| 13 | Flutter onboarding & auth | done | (this) |
 | 14 | Flutter home & dashboard | todo | — |
 | 15 | Flutter plant doctor | todo | — |
 | 16 | Flutter crop advisor + chart narration | todo | — |
@@ -29,10 +29,10 @@ CI: pending
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Phase 13: mobile features/onboarding + auth (splash, language picker, slides, phone, OTP, profile, permissions primer, model download stub, guest path) + integration_test first-run flow.
+Phase 14: mobile features/home (dashboard, offline variant + data-age banner, weather detail, alerts list/detail, scan history, saved log, Bangla parity); offline test with network disabled.
 
 ## BLOCKERS
 none (after a container restart run `dockerd &` for integration tests)
 
 ## DECISIONS THIS PHASE
-- drift raw SQL; manual DI; ChangeNotifier; tokens in code (no Figma access)
+- permissions primer only; ModelSource port + stub; shared first-run flow (CI + integration_test)

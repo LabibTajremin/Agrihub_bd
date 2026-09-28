@@ -43,6 +43,8 @@ class LanguageSnapshot {
   final Map<String, String> entries;
 
   bool get isRtl => language.isRtl;
+
+  bool has(String key) => entries.containsKey(key);
   TextDirection get direction => isRtl ? TextDirection.rtl : TextDirection.ltr;
 
   /// Looks up [key] and fills `{param}` placeholders. A missing key throws in
@@ -142,4 +144,10 @@ class L10nScope extends InheritedNotifier<LocalizationRepository> {
 extension Translate on BuildContext {
   /// `context.t('home.quickscan.title')`
   String t(String key, [Map<String, Object?> params = const {}]) => L10nScope.of(this).t(key, params);
+
+  /// Translates an API failure; unknown server keys fall back to a generic message.
+  String tError(ApiException e) {
+    final l10n = L10nScope.of(this);
+    return l10n.t(l10n.current.has(e.messageKey) ? e.messageKey : 'errors.internal');
+  }
 }

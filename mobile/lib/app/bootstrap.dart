@@ -7,11 +7,13 @@ import 'package:path_provider/path_provider.dart';
 
 import '../core/clock.dart';
 import '../core/l10n/localization.dart';
+import '../core/models/offline_model.dart';
 import '../core/network/api_client.dart';
 import '../core/network/connectivity.dart';
 import '../core/storage/local_db.dart';
 import '../core/storage/token_store.dart';
 import '../core/sync/sync_queue.dart';
+import '../features/onboarding/auth_repository.dart';
 import 'services.dart';
 
 /// API base URL, set at build time: --dart-define=API_BASE_URL=https://…
@@ -31,6 +33,11 @@ Future<AppServices> bootstrap({String baseUrl = apiBaseUrl}) async {
   await connectivity.start();
   final sync = SyncQueue(db: db, api: api, ids: ids, clock: clock);
   await sync.refresh();
+  final models = OfflineModelManager(db: db);
+  await models.load();
   return AppServices(
-      clock: clock, ids: ids, db: db, tokens: tokens, api: api, connectivity: connectivity, l10n: l10n, sync: sync);
+      clock: clock, ids: ids, db: db, tokens: tokens, api: api, connectivity: connectivity, l10n: l10n,
+      sync: sync,
+      auth: AuthRepository(api: api, tokens: tokens, db: db),
+      models: models);
 }

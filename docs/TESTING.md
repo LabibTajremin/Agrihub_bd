@@ -13,3 +13,7 @@
   failures so every repository error branch is testable against a real database.
 - Use `idgen.UUIDv7{}` (not `idgen.Sequence`) when several transactions insert rows in one test:
   equal primary keys in concurrent uncommitted transactions block on each other.
+
+## Mobile flows
+- Screen tests live in `mobile/test/features/<feature>/`; journeys in `mobile/test/flows/`.
+- The first-run journey also runs on a device: `cd mobile && flutter test integration_test`.

@@ -2,11 +2,14 @@ import 'package:flutter/widgets.dart';
 
 import '../core/clock.dart';
 import '../core/l10n/localization.dart';
+import '../core/models/offline_model.dart';
 import '../core/network/api_client.dart';
 import '../core/network/connectivity.dart';
 import '../core/storage/local_db.dart';
 import '../core/storage/token_store.dart';
 import '../core/sync/sync_queue.dart';
+import '../features/onboarding/auth_repository.dart';
+import '../features/onboarding/onboarding_store.dart';
 
 /// The app's service container (manual constructor injection — no reflection,
 /// no generated code). Production builds it in bootstrap; tests build it from
@@ -21,7 +24,9 @@ class AppServices {
     required this.connectivity,
     required this.l10n,
     required this.sync,
-  });
+    required this.auth,
+    required this.models,
+  }) : onboarding = OnboardingStore(db);
 
   final Clock clock;
   final IdGenerator ids;
@@ -31,6 +36,9 @@ class AppServices {
   final ConnectivityService connectivity;
   final LocalizationRepository l10n;
   final SyncQueue sync;
+  final AuthRepository auth;
+  final OfflineModelManager models;
+  final OnboardingStore onboarding;
 }
 
 /// Exposes [AppServices] to the widget tree.

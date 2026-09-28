@@ -134,3 +134,13 @@ One line per non-obvious choice: **decision** — rationale.
   available to this build; values follow the kit's structure (colour 18, spacing 8, radius 4,
   elevation 1, type 6) and can be updated in one place.
 - **Goldens are rendered with the test font (Ahem)** — they pin layout and mirroring, not glyphs.
+
+## Phase 13 — Flutter onboarding & auth
+- **Permissions primer, not permission requests** — the primer explains camera/location/microphone;
+  the OS prompt appears on first use of each (camera, geolocator, recorder). No extra plugin.
+- **Offline model download is a `ModelSource` port + `StubModelSource`** (§14 open slot): progress
+  and install state are real (`OfflineModelManager`), the package itself is not.
+- **One first-run flow, two runners** — `test/flows/first_run.dart` runs headless in CI
+  (`test/features/onboarding/first_run_flow_test.dart`) and on a device (`integration_test/`).
+- **Unknown server error keys fall back to `errors.internal`** (`context.tError`), so a newer server
+  never crashes an older app in strict mode.
