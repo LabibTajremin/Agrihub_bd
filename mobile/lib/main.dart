@@ -1,15 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
-void main() => runApp(const AgriSmartApp());
+import 'app/app.dart';
+import 'app/bootstrap.dart';
 
-class AgriSmartApp extends StatelessWidget {
-  const AgriSmartApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'AgriSmart',
-      home: Scaffold(body: Center(child: Text('AgriSmart'))),
-    );
-  }
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(AgriSmartApp(services: await bootstrap()));
 }

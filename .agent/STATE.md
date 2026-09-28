@@ -1,8 +1,8 @@
 # BUILD STATE
-Updated: 2026-09-25
+Updated: 2026-09-28
 Branch: claude/festive-maxwell-n5xdmi
 PR: #1 (draft)
-Last commit: phase 11
+Last commit: phase 12
 CI: pending
 
 ## PHASES
@@ -19,8 +19,8 @@ CI: pending
 | 8 | Advisory | done | 361c350 |
 | 9 | Weather & Alert | done | ac99c43 |
 | 10 | AI adapter (OPEN SLOT) | done | de74f01 |
-| 11 | API assembly & deploy targets | done | (this) |
-| 12 | Flutter foundation | todo | — |
+| 11 | API assembly & deploy targets | done | 6ce7757 |
+| 12 | Flutter foundation | done | (this) |
 | 13 | Flutter onboarding & auth | todo | — |
 | 14 | Flutter home & dashboard | todo | — |
 | 15 | Flutter plant doctor | todo | — |
@@ -29,10 +29,10 @@ CI: pending
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Phase 12: Flutter foundation — theme tokens, DI, go_router, Dio (auth interceptor, refresh-on-401, retry), secure storage, local store, offline queue, runtime i18n with RTL; goldens.
+Phase 13: mobile features/onboarding + auth (splash, language picker, slides, phone, OTP, profile, permissions primer, model download stub, guest path) + integration_test first-run flow.
 
 ## BLOCKERS
-none
+none (after a container restart run `dockerd &` for integration tests)
 
 ## DECISIONS THIS PHASE
-- jsonb as text (exec-mode bug) + harness in prod pool mode; flush after every request; ReadFile config
+- drift raw SQL; manual DI; ChangeNotifier; tokens in code (no Figma access)

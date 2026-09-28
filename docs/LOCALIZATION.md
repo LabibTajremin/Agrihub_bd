@@ -43,3 +43,13 @@ instances converge without coordination.
 1. Add the key to all seven JSON files (same key, translated value).
 2. `make i18n-sync`, then `make verify`.
 3. Deploy + `make seed` (or `PUT /v1/i18n/{lang}/entries`): clients receive it as a delta.
+
+## Flutter client
+- `assets/i18n/{lang}.json` is bundled, so the first launch is instant and offline.
+- `LocalizationRepository` loads bundled seed → persisted overlay (`kv: i18n.dict.<lang>`) and syncs
+  deltas (`GET /v1/i18n/{lang}?since=<version>`), publishing a `LanguageSnapshot` on `watch()`.
+- The app root listens to the repository: switching language rebuilds in place — no restart
+  (`test/app/app_test.dart` asserts the same Scaffold state survives the switch).
+- `Directionality` is set from the snapshot's `is_rtl` flag (Arabic) — never from a list of codes.
+- `context.t('key', {'param': v})`. A missing key throws in strict mode (debug/tests) and returns the
+  key in release. `l10n_test.dart` asserts every key literal in `lib/` exists in all 7 dictionaries.

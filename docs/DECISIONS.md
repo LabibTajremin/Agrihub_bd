@@ -124,3 +124,13 @@ One line per non-obvious choice: **decision** — rationale.
 - **Config files are read with `os.ReadFile`** (absolute paths work, e.g. mounted in a container).
 - **Docker image defaults to `pool_mode=session`** (direct Postgres); Vercel uses the `transaction`
   default behind a pooler.
+
+## Phase 12
+- **Local store: drift over SQLite with raw SQL (no codegen)** — Drift as specified, without generated
+  files to exclude from coverage.
+- **Manual DI (`AppServices` + `AppScope`)** — preferred by the spec; nothing generated.
+- **State: `ChangeNotifier` + `ListenableBuilder`** — no state-management dependency.
+- **Design tokens are defined in code** (`core/theme/tokens.dart`, 37 tokens) — the Figma file was not
+  available to this build; values follow the kit's structure (colour 18, spacing 8, radius 4,
+  elevation 1, type 6) and can be updated in one place.
+- **Goldens are rendered with the test font (Ahem)** — they pin layout and mirroring, not glyphs.

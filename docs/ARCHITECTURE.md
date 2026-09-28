@@ -147,3 +147,22 @@ Swapping the in-process bus for NATS/Kafka at extraction time replaces the `Disp
   completed diagnosis. Consumers subscribe to `weather.forecast.updated` and
   `diagnosis.scan.completed`; alerts are unique per (user, source event, kind), so redelivery is a
   no-op. Push delivery is a `Notifier` port with a logging stub.
+
+## Mobile (Flutter)
+```
+mobile/lib/
+  main.dart            bootstrap → AgriSmartApp
+  app/                 services (manual DI), router (go_router), shell, root widget
+  core/
+    theme/             37 design tokens → ThemeData (single source of truth)
+    l10n/              dictionaries, runtime switching, RTL from is_rtl
+    network/           Dio client: bearer, refresh-on-401 (single flight), GET retry w/ backoff; connectivity
+    storage/           LocalDb (drift/SQLite, raw SQL: kv + sync_ops), secure token store
+    sync/              offline operation queue (§6.7)
+  features/<feature>/{domain,data,presentation}
+```
+- **DI** is a plain `AppServices` object passed through `AppScope` — no code generation.
+- **Offline-first**: every repository reads from `LocalDb` first; writes made offline are queued in
+  `sync_ops` (monotonic `seq`, UUIDv7 `idempotency_key`) and flushed to `POST /v1/scans/sync`.
+- **Plugins are adapters**: every platform plugin (camera, location, audio, connectivity, secure storage,
+  paths) sits behind an interface and is tested with its platform-interface fake.

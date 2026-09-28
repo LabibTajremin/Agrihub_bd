@@ -1,0 +1,45 @@
+import 'package:flutter/widgets.dart';
+
+import '../core/clock.dart';
+import '../core/l10n/localization.dart';
+import '../core/network/api_client.dart';
+import '../core/network/connectivity.dart';
+import '../core/storage/local_db.dart';
+import '../core/storage/token_store.dart';
+import '../core/sync/sync_queue.dart';
+
+/// The app's service container (manual constructor injection — no reflection,
+/// no generated code). Production builds it in bootstrap; tests build it from
+/// fakes.
+class AppServices {
+  AppServices({
+    required this.clock,
+    required this.ids,
+    required this.db,
+    required this.tokens,
+    required this.api,
+    required this.connectivity,
+    required this.l10n,
+    required this.sync,
+  });
+
+  final Clock clock;
+  final IdGenerator ids;
+  final LocalDb db;
+  final TokenStore tokens;
+  final ApiClient api;
+  final ConnectivityService connectivity;
+  final LocalizationRepository l10n;
+  final SyncQueue sync;
+}
+
+/// Exposes [AppServices] to the widget tree.
+class AppScope extends InheritedWidget {
+  const AppScope({super.key, required this.services, required super.child});
+  final AppServices services;
+
+  static AppServices of(BuildContext context) => context.getInheritedWidgetOfExactType<AppScope>()!.services;
+
+  @override
+  bool updateShouldNotify(AppScope oldWidget) => services != oldWidget.services;
+}
