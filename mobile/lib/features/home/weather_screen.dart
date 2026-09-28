@@ -5,6 +5,7 @@ import '../../core/l10n/localization.dart';
 import '../../core/network/cached.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/async_view.dart';
+import '../../core/widgets/chart.dart';
 import '../../core/widgets/data_age.dart';
 import 'models.dart';
 
@@ -31,6 +32,11 @@ class WeatherScreen extends StatelessWidget {
             ),
           Expanded(
             child: ListView(padding: const EdgeInsets.all(Tokens.spaceLg), children: [
+              BarChart(kind: 'weather', title: context.t('weather.rainfall'), bars: [
+                for (final d in f.value.days)
+                  Bar(MaterialLocalizations.of(context).narrowWeekdays[d.date.weekday % 7], d.rainMm,
+                      caption: '${d.rainMm.round()}', color: Tokens.info),
+              ]),
               Text(context.t('weather.forecast'), style: Tokens.title),
               for (final d in f.value.days)
                 Card(

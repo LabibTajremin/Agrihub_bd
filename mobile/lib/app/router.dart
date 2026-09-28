@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 
 import '../core/l10n/localization.dart';
 import '../core/theme/tokens.dart';
+import '../features/advisor/advice_screens.dart';
+import '../features/advisor/fields_screen.dart';
+import '../features/advisor/setup_screen.dart';
 import '../features/doctor/camera_screen.dart';
 import '../features/doctor/preview_screen.dart';
 import '../features/doctor/result_screen.dart';
@@ -80,7 +83,26 @@ GoRouter buildRouter({String initialLocation = '/'}) {
             GoRoute(path: 'result/:id', builder: (_, state) => ResultScreen(id: state.pathParameters['id']!)),
             GoRoute(path: 'sync', builder: (_, _) => const SyncScreen()),
           ]),
-          GoRoute(path: '/advisor', builder: (_, _) => const ComingSoon(titleKey: 'advisor.fields.title')),
+          GoRoute(path: '/advisor', builder: (_, _) => const FieldsScreen(), routes: [
+            GoRoute(path: 'season', builder: (_, _) => const SeasonScreen()),
+            GoRoute(path: 'new', builder: (_, _) => const FieldSetupScreen(), routes: [
+              GoRoute(path: 'location', builder: (_, _) => const GpsScreen()),
+            ]),
+            GoRoute(
+                path: 'field/:id',
+                builder: (_, s) => RecommendationsScreen(field: s.pathParameters['id']!),
+                routes: [
+                  GoRoute(path: 'rotation', builder: (_, s) => RotationScreen(field: s.pathParameters['id']!)),
+                  GoRoute(
+                      path: 'crop/:code',
+                      builder: (_, s) => CropDetailScreen(field: s.pathParameters['id']!, code: s.pathParameters['code']!),
+                      routes: [
+                        GoRoute(
+                            path: 'roi',
+                            builder: (_, s) => RoiScreen(field: s.pathParameters['id']!, code: s.pathParameters['code']!)),
+                      ]),
+                ]),
+          ]),
           GoRoute(path: '/voice', builder: (_, _) => const ComingSoon(titleKey: 'voice.title')),
           GoRoute(path: '/settings', builder: (_, _) => const ComingSoon(titleKey: 'settings.title'), routes: [
             GoRoute(path: 'expert', builder: (_, _) => const ComingSoon(titleKey: 'settings.expert_help')),

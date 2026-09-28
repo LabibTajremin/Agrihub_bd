@@ -2,8 +2,8 @@
 Updated: 2026-09-28
 Branch: claude/festive-maxwell-n5xdmi
 PR: #1 (draft)
-Last commit: phase 15
-CI: phase 12 green; 13–15 pending
+Last commit: phase 16
+CI: 12 green; 14 red (SystemClock const ctor coverage) fixed in 6919683; 15–16 pending
 
 ## PHASES
 | # | Name | Status | Commit |
@@ -23,16 +23,16 @@ CI: phase 12 green; 13–15 pending
 | 12 | Flutter foundation | done | d222468 |
 | 13 | Flutter onboarding & auth | done | 9c3f2f0 |
 | 14 | Flutter home & dashboard | done | 4056a79 (+34bcd73 lint fix) |
-| 15 | Flutter plant doctor | done | (this) |
-| 16 | Flutter crop advisor + chart narration | todo | — |
+| 15 | Flutter plant doctor | done | 3c15807 |
+| 16 | Flutter crop advisor + chart narration | done | (this) |
 | 17 | Flutter voice shell + settings | todo | — |
 | 18 | Hardening & handoff | todo | — |
 
 ## NEXT ACTION
-Phase 16: mobile features/advisor (fields list/empty, setup, GPS pin via GeolocatorPlatform fake, seasonal forecast, recommendations, crop detail, ROI, rotation) + NarrationControl on every chart (audioplayers fake, pre-recorded clip only).
+Phase 17: mobile features/voice (idle/listening/understanding/response/not-understood/help → POST /v1/assistant/ask stub; recorder behind a port, no STT) + settings (language, offline models, expert help, profile, privacy, sign out).
 
 ## BLOCKERS
 none (after a container restart run `dockerd &` for integration tests)
 
 ## DECISIONS THIS PHASE
-- on-device first diagnosis; upload at sync; blobs table (schema v2); manual sync (auto → phase 18)
+- BarChart always narrated; clip delivery client-side by checksum; AudioOut/LocationGateway ports

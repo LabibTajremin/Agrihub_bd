@@ -14,6 +14,9 @@ import 'package:agrismart/core/storage/local_db.dart';
 import 'package:agrismart/core/storage/token_store.dart';
 import 'package:agrismart/core/sync/sync_queue.dart';
 import 'package:agrismart/features/onboarding/auth_repository.dart';
+import 'package:audioplayers_platform_interface/audioplayers_platform_interface.dart';
+import 'package:crypto/crypto.dart';
+import 'package:geolocator_platform_interface/geolocator_platform_interface.dart';
 import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:connectivity_plus_platform_interface/connectivity_plus_platform_interface.dart';
 import 'package:dio/dio.dart';
@@ -146,6 +149,72 @@ abstract final class CameraDescriptionFake {
   static const front = CameraDescription(name: 'front', lensDirection: CameraLensDirection.front, sensorOrientation: 0);
 }
 
+/// audioplayers fake: records what plays; [finish] ends the current clip.
+class FakeAudioPlatform extends AudioplayersPlatformInterface with MockPlatformInterfaceMixin {
+  final events = <String, StreamController<AudioEvent>>{};
+  final played = <Uint8List>[];
+  int stops = 0;
+
+  StreamController<AudioEvent> _c(String id) => events.putIfAbsent(id, StreamController<AudioEvent>.broadcast);
+
+  @override
+  Stream<AudioEvent> getEventStream(String playerId) => _c(playerId).stream;
+  @override
+  Future<void> setSourceBytes(String playerId, Uint8List bytes, {String? mimeType}) async {
+    played.add(bytes);
+    _c(playerId).add(const AudioEvent(eventType: AudioEventType.prepared, isPrepared: true));
+  }
+  @override
+  Future<void> stop(String playerId) async => stops++;
+  @override
+  Future<int?> getDuration(String playerId) async => 3000;
+  @override
+  Future<int?> getCurrentPosition(String playerId) async => 0;
+
+  void finish() {
+    for (final c in events.values) {
+      c.add(const AudioEvent(eventType: AudioEventType.complete));
+    }
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => Future<void>.value();
+}
+
+class FakeGlobalAudioPlatform extends GlobalAudioplayersPlatformInterface with MockPlatformInterfaceMixin {
+  @override
+  Stream<GlobalAudioEvent> getGlobalEventStream() => const Stream.empty();
+  @override
+  dynamic noSuchMethod(Invocation invocation) => Future<void>.value();
+}
+
+/// geolocator fake: a fixed position unless disabled or refused.
+class FakeGeolocator extends GeolocatorPlatform with MockPlatformInterfaceMixin {
+  bool enabled = true;
+  LocationPermission permission = LocationPermission.denied;
+  LocationPermission onRequest = LocationPermission.whileInUse;
+  ({double lat, double lng}) at = (lat: 24.8481, lng: 89.3730);
+
+  @override
+  Future<bool> isLocationServiceEnabled() async => enabled;
+  @override
+  Future<LocationPermission> checkPermission() async => permission;
+  @override
+  Future<LocationPermission> requestPermission() async => permission = onRequest;
+  @override
+  Future<Position> getCurrentPosition({LocationSettings? locationSettings}) async => Position(
+      latitude: at.lat,
+      longitude: at.lng,
+      timestamp: epoch,
+      accuracy: 5,
+      altitude: 0,
+      altitudeAccuracy: 0,
+      heading: 0,
+      headingAccuracy: 0,
+      speed: 0,
+      speedAccuracy: 0);
+}
+
 /// Returns scripted diagnoses in order and counts calls.
 class ScriptedEngine implements DiagnosisEngine {
   ScriptedEngine(this.results);
@@ -177,18 +246,25 @@ class ControlledModelSource implements ModelSource {
 
 /// Everything a test needs, built from fakes.
 class TestKit {
-  TestKit._(this.services, this.server, this.tokens, this.clock, this.camera);
+  TestKit._(this.services, this.server, this.tokens, this.clock, this.camera, this.audio, this.geo);
   final AppServices services;
   final FakeServer server;
   final MemoryTokenStore tokens;
   final FixedClock clock;
   final FakeCameraPlatform camera;
+  final FakeAudioPlatform audio;
+  final FakeGeolocator geo;
 
   static Future<TestKit> create(
       {String lang = 'en', bool strict = true, ModelSource? modelSource, DiagnosisEngine? engine}) async {
     ConnectivityPlatform.instance = FakeConnectivity();
     final camera = FakeCameraPlatform();
     CameraPlatform.instance = camera;
+    final audio = FakeAudioPlatform();
+    AudioplayersPlatformInterface.instance = audio;
+    GlobalAudioplayersPlatformInterface.instance = FakeGlobalAudioPlatform();
+    final geo = FakeGeolocator();
+    GeolocatorPlatform.instance = geo;
     final server = FakeServer();
     final tokens = MemoryTokenStore();
     final clock = FixedClock(epoch);
@@ -211,7 +287,7 @@ class TestKit {
       models: OfflineModelManager(db: db, source: modelSource ?? const StubModelSource()),
       engine: engine ?? const StubDiagnosisEngine(),
     );
-    return TestKit._(services, server, tokens, clock, camera);
+    return TestKit._(services, server, tokens, clock, camera, audio, geo);
   }
 
   Future<void> signIn({String role = 'farmer'}) =>
@@ -299,6 +375,83 @@ class TestKit {
         ],
       });
     });
+  }
+
+  /// Voice manifest for [lang] with a clip for each of [keys]; clip bodies are
+  /// the key itself (JSON-encoded by the fake server).
+  void stubVoice(String lang, List<String> keys, {bool corrupt = false}) {
+    server.json('GET', '/v1/voice/$lang', {
+      'lang': lang,
+      'version': 1,
+      'full': true,
+      'clips': {
+        for (final k in keys)
+          k: {
+            'url': 'http://cdn.test/$lang/$k.mp3',
+            'duration_ms': 3000,
+            'checksum': sha256.convert(utf8.encode(jsonEncode(corrupt ? 'x' : k))).toString(),
+          },
+      },
+    });
+    for (final k in keys) {
+      server.json('GET', 'http://cdn.test/$lang/$k.mp3', k);
+    }
+  }
+
+  static Map<String, Object?> fieldJson(String id, String name) => {
+        'id': id,
+        'owner_id': 'u',
+        'name': name,
+        'area': {'unit': 'bigha', 'value_milli': 1500, 'decimal_milli': 0, 'bigha_milli': 1500, 'acre_milli': 0, 'hectare_milli': 0},
+        'location': {'lat': 24.85, 'lng': 89.37},
+        'district': '',
+        'irrigation': 'partial',
+        'soil': {'texture': 'loam', 'ph': 6.5},
+        'plots': <Object>[],
+        'created_at': '2026-03-01T06:00:00Z',
+        'updated_at': '2026-03-01T06:00:00Z',
+      };
+
+  static Map<String, Object?> recJson(String code, double score) => {
+        'crop_code': code,
+        'name_key': 'crop.$code.name',
+        'score': score,
+        'criteria': {'soil': 0.9, 'water': 0.7, 'pest': 0.6, 'market': 0.8, 'seed': 1.0},
+        'yield_kg': {'low': 3000, 'likely': 4200, 'high': 5100},
+      };
+
+  static Map<String, Object?> roiJson({int seed = 800000}) => {
+        'yield_kg': {'low': 3000, 'likely': 4200, 'high': 5100},
+        'costs_poisha': {'seed': seed, 'fertiliser': 1200000, 'pesticide': 500000, 'irrigation': 900000, 'labour': 2000000},
+        'gross_poisha': {'low': 7500000, 'likely': 10500000, 'high': 12750000},
+        'total_cost_poisha': 5400000 + seed - 800000,
+        'net_poisha': {'low': 2100000, 'likely': 5100000 - seed + 800000, 'high': 7350000},
+        'return_bp': 9444,
+      };
+
+  /// Installs fields, advisory and seasonal endpoints for one field `f1`.
+  void stubAdvisor({List<Map<String, Object?>>? fields}) {
+    server.json('GET', '/v1/fields', {'fields': fields ?? [fieldJson('f1', 'North plot')]});
+    server.on('POST', '/v1/fields', (req) => Reply(201, {...fieldJson('f2', (req.body! as Map)['name'] as String)}));
+    server.json('GET', '/v1/advisory/fields/f1/recommendations', {
+      'season': 'boro',
+      'outlook': {'rain_mm': 180, 'data_age_seconds': 0, 'stale': false},
+      'items': [recJson('rice_boro', 86), recJson('wheat', 71), recJson('mustard', 64), recJson('okra', 40)],
+    });
+    server.json('GET', '/v1/advisory/fields/f1/crops/wheat',
+        {...recJson('wheat', 71), 'season': 'boro', 'outlook': {'rain_mm': 180}, 'roi': roiJson()});
+    server.on('POST', '/v1/advisory/fields/f1/crops/wheat/roi',
+        (req) => Reply(200, roiJson(seed: ((req.body! as Map)['costs_poisha'] as Map)['seed'] as int)));
+    server.json('GET', '/v1/advisory/fields/f1/rotation', {
+      'steps': [
+        {'season': 'boro', 'crop_code': 'rice_boro', 'name_key': 'crop.rice_boro.name', 'nitrogen_before_kg_ha': 60, 'nitrogen_after_kg_ha': 20, 'score': 80},
+        {'season': 'aus', 'crop_code': 'mungbean', 'name_key': 'crop.mungbean.name', 'nitrogen_before_kg_ha': 20, 'nitrogen_after_kg_ha': 55, 'score': 70},
+        {'season': 'aman', 'crop_code': 'rice_aman', 'name_key': 'crop.rice_aman.name', 'nitrogen_before_kg_ha': 55, 'nitrogen_after_kg_ha': 15, 'score': 75},
+      ],
+      'nitrogen_deficit': true,
+    });
+    server.json('GET', '/v1/weather/seasonal',
+        {'current_season': 'boro', 'rain_mm': {'aus': 600, 'aman': 1400, 'boro': 150}, 'data_age_seconds': 0, 'stale': false});
   }
 
   static Map<String, Object?> alertJson(String id, String kind, String severity, Map<String, String> params,

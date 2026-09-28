@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../core/audio/voice.dart';
 import '../core/clock.dart';
 import '../core/l10n/localization.dart';
 import '../core/models/offline_model.dart';
@@ -9,6 +10,8 @@ import '../core/network/connectivity.dart';
 import '../core/storage/local_db.dart';
 import '../core/storage/token_store.dart';
 import '../core/sync/sync_queue.dart';
+import '../features/advisor/advisor_repository.dart';
+import '../features/advisor/location_gateway.dart';
 import '../features/doctor/camera_gateway.dart';
 import '../features/doctor/diagnosis_engine.dart';
 import '../features/doctor/doctor_repository.dart';
@@ -33,7 +36,10 @@ class AppServices {
     required this.models,
     this.camera = PluginCamera.new,
     this.engine = const StubDiagnosisEngine(),
-  }) : onboarding = OnboardingStore(db);
+    AudioOut? audio,
+    this.location = const PluginLocation(),
+  })  : audio = audio ?? PluginAudioOut(),
+        onboarding = OnboardingStore(db);
 
   final Clock clock;
   final IdGenerator ids;
@@ -50,8 +56,13 @@ class AppServices {
   /// Opens a camera for the viewfinder (a fresh gateway per screen).
   final CameraGateway Function() camera;
   final DiagnosisEngine engine;
+  final AudioOut audio;
+  final LocationGateway location;
   late final reader = CachedReader(api: api, db: db, clock: clock, connectivity: connectivity);
   late final home = HomeRepository(reader: reader, api: api, db: db);
+  late final advisor = AdvisorRepository(reader: reader, api: api, home: home);
+  late final voice = VoiceRepository(reader: reader, api: api, db: db);
+  late final narration = NarrationController(voice: voice, out: audio, language: () => l10n.current.language.code);
   late final doctor = DoctorRepository(
       db: db, api: api, sync: sync, ids: ids, clock: clock, engine: engine, language: () => l10n.current.language.code);
 }

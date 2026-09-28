@@ -163,3 +163,15 @@ One line per non-obvious choice: **decision** — rationale.
 - **Camera behind `CameraGateway`**; the plugin adapter is tested through a `CameraPlatform` fake.
 - **No gallery picker** — it would add a plugin; the camera is the product path.
 - **Sync is manual ("Sync now") in this phase**; automatic sync on reconnect is deferred to hardening.
+
+## Phase 16 — Flutter Crop Advisor + chart narration
+- **One chart widget (`BarChart`) that always renders a `NarrationControl`** — narration cannot be
+  omitted; a test walks every chart screen and asserts each chart carries exactly one control.
+- **Narration is client-side clip delivery** (§5.5): chart kind → `narration.chart.<kind>` key →
+  clip from the language's voice manifest, downloaded lazily, verified by SHA-256 and cached by
+  checksum in the local blob table; the text is always shown. `/v1/advisory/narrate` (AI slot) is
+  not called. A missing clip shows "audio not available".
+- **Audio and GPS behind ports** (`AudioOut`, `LocationGateway`), adapters tested through the
+  audioplayers and geolocator platform fakes. The audio position ticker is disabled (no progress UI).
+- **Money is poisha end to end**; the UI formats taka with the dictionary's `unit.taka` pattern.
+- **Creating a field also sets the home location** used by weather and the seasonal outlook.

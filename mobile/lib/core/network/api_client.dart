@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 
@@ -152,6 +153,16 @@ class ApiClient {
         ...headers,
         Headers.contentLengthHeader: bytes.length,
       }));
+    } on DioException catch (e) {
+      throw _map(e);
+    }
+  }
+
+  /// Downloads raw bytes (voice clips) from an absolute or API-relative URL.
+  Future<Uint8List> download(String url) async {
+    try {
+      final res = await _bare.get<List<int>>(url, options: Options(responseType: ResponseType.bytes));
+      return Uint8List.fromList(res.data!);
     } on DioException catch (e) {
       throw _map(e);
     }
