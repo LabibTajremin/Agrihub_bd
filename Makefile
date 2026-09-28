@@ -11,7 +11,8 @@ QUIET := ./scripts/quiet.sh
 COVER_PKGS := ./...
 
 .PHONY: verify verify-backend verify-mobile lint vet arch-test unit integration test coverage-gate \
-	run migrate seed docker openapi i18n-sync mobile-deps mobile-analyze mobile-test mobile-coverage-gate
+	run migrate seed docker openapi i18n-sync mobile-deps mobile-analyze mobile-test mobile-coverage-gate \
+	security e2e loadtest tools
 
 verify: verify-backend verify-mobile ## everything CI checks
 
@@ -39,6 +40,22 @@ test: unit integration
 
 coverage-gate:
 	cd $(BACKEND) && $(GO) run scripts/coverage_gate.go -profile coverage.out -threshold 100 -v
+
+GOBIN := $(shell $(GO) env GOPATH)/bin
+
+tools: ## pinned helper binaries (govulncheck, vegeta)
+	$(GO) install golang.org/x/vuln/cmd/govulncheck@v1.8.0
+	$(GO) install github.com/tsenart/vegeta/v12@v12.13.0
+
+security: ## govulncheck (gosec runs inside `make lint`) + flutter analyze
+	cd $(BACKEND) && $(GOBIN)/govulncheck ./...
+	cd $(MOBILE) && $(FLUTTER) analyze --fatal-infos
+
+e2e: ## Flutter client code against the real API + Postgres (needs Docker)
+	./scripts/e2e.sh
+
+loadtest: ## vegeta baseline on the top 5 endpoints (needs Docker); RATE=, DURATION=
+	./scripts/with-stack.sh ./scripts/loadtest.sh
 
 run:
 	cd $(BACKEND) && $(GO) run ./cmd/api -config config.example.yaml

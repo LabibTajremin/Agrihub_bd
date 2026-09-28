@@ -67,6 +67,16 @@ class AppServices {
   late final voice = VoiceController(api: api, input: voiceInput, language: () => l10n.current.language.code);
   late final clips = VoiceRepository(reader: reader, api: api, db: db);
   late final narration = NarrationController(voice: clips, out: audio, language: () => l10n.current.language.code);
+  /// Pushes everything waiting offline; failures leave it queued for next time.
+  Future<void> syncAll() async {
+    try {
+      await doctor.syncNow();
+      await sync.flush();
+    } on ApiException {
+      // stays queued; the sync screen shows the reason
+    }
+  }
+
   late final doctor = DoctorRepository(
       db: db, api: api, sync: sync, ids: ids, clock: clock, engine: engine, language: () => l10n.current.language.code);
 }

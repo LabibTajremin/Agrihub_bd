@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 
 /// Below this confidence the result is not shown as a diagnosis; the farmer
-/// is asked to retake the photo or ask an expert (§6.9, mirrors the server).
-const confidenceThreshold = 0.7;
+/// is asked to retake the photo or ask an expert (§6.9; mirrors the server default `ai.min_diagnosis_confidence`).
+const confidenceThreshold = 0.6;
 
 /// A treatment plan: dictionary keys for each step.
 class TreatmentPlan {

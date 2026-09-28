@@ -263,9 +263,9 @@ void main() {
       expect(seen, containsAll(StubDiagnosisEngine.diseases));
       final healthy = diagnosisOf('healthy', 0.9, severity: 'high');
       expect((healthy.healthy, healthy.severity, healthy.plan('chemical')), (true, 'low', null));
-      final round = LeafDiagnosis.fromJson(diagnosisOf('tungro', 0.6).toJson());
+      final round = LeafDiagnosis.fromJson(diagnosisOf('tungro', 0.55).toJson());
       expect((round.confident, round.plan('chemical')!.safetyKey), (false, 'treatment.safety'));
-      expect(confidenceThreshold, 0.7);
+      expect(confidenceThreshold, 0.6);
     });
 
     test('dHash: stable, small distance for re-encodes, null for non-images', () {

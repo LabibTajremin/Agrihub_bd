@@ -186,3 +186,13 @@ One line per non-obvious choice: **decision** — rationale.
 - **Sign-out always completes locally** (tokens + cached profile dropped) even when the server
   revoke call cannot be made.
 - **Language changes are pushed to the profile best-effort**; offline, the local choice stands.
+
+## Phase 18 — Hardening & handoff
+- **E2E drives the app's own repositories against the live API** (`mobile/e2e`, `make e2e`):
+  real sockets, real Postgres, OTP via `expose_otp`. Widget-level journeys stay on fakes; a device
+  run of the first-run journey lives in `integration_test/`.
+- **Load baseline with vegeta** (pinned v12.13.0) on i18n, weather, scans, recommendations and the
+  assistant — numbers in `docs/TESTING.md`.
+- **`AutoSync`** flushes the offline queue when connectivity returns (deferred from phase 15).
+- **Client confidence threshold = 0.60**, the server's `ai.min_diagnosis_confidence` default.
+- **govulncheck** (pinned v1.8.0) in CI; `moby/go-archive` bumped to v0.3.0 (test-only chain).

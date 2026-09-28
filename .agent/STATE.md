@@ -2,8 +2,8 @@
 Updated: 2026-09-28
 Branch: claude/festive-maxwell-n5xdmi
 PR: #1 (draft)
-Last commit: phase 17
-CI: green through 6919683 (phase 15); 16–17 pending
+Last commit: phase 18
+CI: pending (backend verify, mobile verify, e2e green locally)
 
 ## PHASES
 | # | Name | Status | Commit |
@@ -25,14 +25,14 @@ CI: green through 6919683 (phase 15); 16–17 pending
 | 14 | Flutter home & dashboard | done | 4056a79 (+34bcd73 lint fix) |
 | 15 | Flutter plant doctor | done | 3c15807 |
 | 16 | Flutter crop advisor + chart narration | done | d1f5a6b |
-| 17 | Flutter voice shell + settings | done | (this) |
-| 18 | Hardening & handoff | todo | — |
+| 17 | Flutter voice shell + settings | done | 10f6887 |
+| 18 | Hardening & handoff | done | (this) |
 
 ## NEXT ACTION
-Phase 18: hardening — auto-sync on reconnect, E2E, k6/vegeta load baseline, gosec/govulncheck/flutter analyze, final docs (README/ARCHITECTURE/DEVELOPMENT/TESTING), PR body finalised, mark PR ready (do not merge).
+Build complete. Watch CI on the phase-18 head; PR #1 is ready for review (do not merge).
 
 ## BLOCKERS
 none (after a container restart run `dockerd &` for integration tests)
 
 ## DECISIONS THIS PHASE
-- VoiceInput port + NoVoiceInput; suggestions as transcripts; helpline copied; local sign-out always
+- E2E = app repositories vs live API (with-stack.sh); vegeta baseline in TESTING.md; AutoSync on reconnect; client threshold 0.60

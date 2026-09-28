@@ -17,6 +17,41 @@ backend/
   internal/app/               composition root (the only place modules meet)
 ```
 
+## Module map
+| Module | Owns (tables) | Routes | Publishes | Consumes / depends on |
+|---|---|---|---|---|
+| `identity` | `identity_users`, `identity_otp_challenges`, `identity_sessions`, `identity_refresh_tokens` | `/v1/auth/*`, `/v1/me` | `identity.user.registered` | — |
+| `localization` | `languages`, `dictionary_entries`, `voice_assets` | `/v1/i18n/*`, `/v1/voice/*` | `localization.dictionary.updated`, `localization.voice.updated` | — |
+| `farm` | `farm_fields`, `farm_soil_profiles`, `farm_plots` | `/v1/fields/*`, `/v1/crops/*` | `farm.field.created/updated/deleted` | — (publishes `FieldView`, `CropView`) |
+| `media` | `media_objects` | `/v1/media/*` | — | storage port (S3 / local disk) |
+| `diagnosis` | `diagnosis_scans`, `diagnosis_sync_ops`, `diagnosis_sync_audit` | `/v1/scans/*` | `diagnosis.scan.completed/failed` | media (adapter), `aiadapter.DiagnosisEngine` |
+| `advisory` | — (pure computation) | `/v1/advisory/*` | — | farm + weather (adapters), `aiadapter.AdvisoryNarrator` |
+| `weather` | `weather_observations` | `/v1/weather/*` | `weather.forecast.updated` | forecast provider port (stub / Open-Meteo) behind a breaker |
+| `alert` | `alert_subscriptions`, `alert_alerts` | `/v1/alerts/*` | — | `weather.forecast.updated`, `diagnosis.scan.completed`; `Notifier` port |
+| `aiadapter` | — | `/v1/assistant/ask` | — | **open slot**: `DiagnosisEngine`, `AdvisoryNarrator`, `ConversationalAgent` (stub) |
+
+Cross-module reads go through the adapters in `internal/app/adapters.go`; cross-module reactions go
+through outbox events. There are no cross-module SQL joins or foreign keys.
+
+## Extracting a module into a service
+Each module was built so that extraction is mechanical:
+1. **Code**: copy `internal/modules/<m>` and `internal/platform` into a new service; its `main`
+   builds the module with `New(Deps)` and serves `Routes()` through `platform/httpx` (as
+   `internal/app` does today).
+2. **Data**: move the module's tables (its migrations are already separate files named after it) to
+   the new service's database. No other module reads them.
+3. **Synchronous callers**: the adapter in `internal/app/adapters.go` that wraps the module (e.g.
+   `advisoryFarm` for farm) becomes an HTTP/gRPC client with the same method set. The consumer's
+   port does not change, so its use cases and tests do not change.
+4. **Events**: replace `eventbus.Local` as the outbox `Dispatcher` with a broker publisher
+   (NATS/Kafka); consumers subscribe on the broker. Delivery stays at-least-once and every consumer
+   is already idempotent (alerts are unique per source event; sync ops per idempotency key).
+5. **Auth**: tokens are self-contained JWTs with a `kid`; the new service verifies with the shared
+   key set (or a JWKS endpoint after moving to RS256) — no session lookup across services.
+6. **Gateway**: route the module's path prefix (table above) to the new service.
+
+`archtest` keeps this true: a module that imports another module fails the build.
+
 ## Platform kernel
 | Package | Responsibility |
 |---|---|
@@ -156,13 +191,28 @@ mobile/lib/
   core/
     theme/             37 design tokens → ThemeData (single source of truth)
     l10n/              dictionaries, runtime switching, RTL from is_rtl
-    network/           Dio client: bearer, refresh-on-401 (single flight), GET retry w/ backoff; connectivity
-    storage/           LocalDb (drift/SQLite, raw SQL: kv + sync_ops), secure token store
-    sync/              offline operation queue (§6.7)
-  features/<feature>/{domain,data,presentation}
+    network/           Dio client (bearer, refresh-on-401 single flight, GET retry); CachedReader; connectivity
+    storage/           LocalDb (drift/SQLite, raw SQL: kv, sync_ops, blobs), secure token store
+    sync/              offline operation queue (§6.7), AutoSync on reconnect
+    audio/             voice-clip delivery (manifest, checksum cache), AudioOut, NarrationController
+    models/            offline model manager (ModelSource port + stub)
+    widgets/           AsyncView, EmptyState, OfflineBanner, BarChart (+ NarrationControl)
+  features/
+    onboarding/        splash, language, slides, phone, OTP, profile, permissions, model, guest
+    home/              dashboard (+ offline variant), weather, alerts, history, saved log
+    doctor/            viewfinder, preview, analysing, result, sync queue; DiagnosisEngine port + stub, dHash
+    advisor/           fields, setup, GPS pin, season, recommendations, crop, ROI, rotation
+    voice/             tap-to-talk states over /v1/assistant/ask; VoiceInput port (open slot)
+    settings/          language, offline models, expert help, profile, privacy, sign out
 ```
 - **DI** is a plain `AppServices` object passed through `AppScope` — no code generation.
-- **Offline-first**: every repository reads from `LocalDb` first; writes made offline are queued in
-  `sync_ops` (monotonic `seq`, UUIDv7 `idempotency_key`) and flushed to `POST /v1/scans/sync`.
+- **Offline-first reads**: `CachedReader` remembers every GET in `LocalDb`; offline it serves the copy
+  with its age and the UI shows the data-age banner.
+- **Offline-first writes**: a leaf scan is diagnosed on the phone (`DiagnosisEngine`), stored with its
+  photo, and uploaded later (ticket → signed PUT → complete → `create_scan` in `sync_ops`, monotonic
+  `seq`, UUIDv7 `idempotency_key`, flushed to `POST /v1/scans/sync`). `AutoSync` flushes when the
+  network returns; the sync screen offers "sync now".
+- **Charts** are all `BarChart`, which always renders a `NarrationControl` playing the pre-recorded
+  clip for `narration.chart.<kind>` (no TTS).
 - **Plugins are adapters**: every platform plugin (camera, location, audio, connectivity, secure storage,
   paths) sits behind an interface and is tested with its platform-interface fake.

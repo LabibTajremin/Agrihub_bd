@@ -70,8 +70,13 @@ small multilingual keyword table. No network, no randomness — the whole app ru
    `config.AI`, `config.example.yaml` and `.env.example` — the example-coverage test enforces this).
 4. **Test** with the existing suites: diagnosis, advisory and assistant tests run against any
    implementation of the ports; add a contract test for your client with an `httptest` server.
-5. For **on-device** inference in the app, implement the Flutter `DiagnosisEngine` interface in
-   `mobile/lib/features/doctor/domain` the same way; the offline model manager downloads your model
-   file (see `docs/ARCHITECTURE.md`).
+5. **In the app** there are three matching ports, each passed to `AppServices` (see `bootstrap.dart`):
+   - `DiagnosisEngine` (`mobile/lib/features/doctor/diagnosis_engine.dart`) — on-device inference;
+     results below `confidenceThreshold` route to the low-confidence screen.
+   - `ModelSource` (`mobile/lib/core/models/offline_model.dart`) — where the model package is
+     downloaded from; `OfflineModelManager` tracks install state and progress.
+   - `VoiceInput` (`mobile/lib/features/voice/voice_controller.dart`) — recording/recognition;
+     return an `Utterance` with a transcript or an uploaded `audio_media_id` for the server agent.
+   Tests swap each with a scripted fake (`ScriptedEngine`, `ControlledModelSource`, `ScriptedVoiceInput`).
 
 Nothing else changes: no call site, handler or table depends on the implementation.

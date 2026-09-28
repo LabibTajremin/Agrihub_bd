@@ -12,6 +12,7 @@ import '../core/network/api_client.dart';
 import '../core/network/connectivity.dart';
 import '../core/storage/local_db.dart';
 import '../core/storage/token_store.dart';
+import '../core/sync/auto_sync.dart';
 import '../core/sync/sync_queue.dart';
 import '../features/onboarding/auth_repository.dart';
 import 'services.dart';
@@ -35,9 +36,11 @@ Future<AppServices> bootstrap({String baseUrl = apiBaseUrl}) async {
   await sync.refresh();
   final models = OfflineModelManager(db: db);
   await models.load();
-  return AppServices(
+  final services = AppServices(
       clock: clock, ids: ids, db: db, tokens: tokens, api: api, connectivity: connectivity, l10n: l10n,
       sync: sync,
       auth: AuthRepository(api: api, tokens: tokens, db: db),
       models: models);
+  AutoSync(connectivity: connectivity, run: services.syncAll).start();
+  return services;
 }
